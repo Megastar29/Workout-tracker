@@ -1,15 +1,100 @@
 <!doctype html>
-<html lang="ukr">
+<html lang="uk">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Трекер тренувань</title>
   </head>
   <body>
-    <!-- Шапка з назвою -->
-    <!-- Форма для додавання тренування -->
-    <!-- Список тренувань -->
-    <!-- Блок статистики -->
-    <!-- Підвал -->
+    <header>
+      <h1>Трекер тренувань</h1>
+    </header>
+
+    <main>
+      <div aria-hidden="true">
+        <div>
+          <img src="assets/img/img1.jpg" alt="" />
+          <img src="assets/img/img2.jpg" alt="" />
+          <img src="assets/img/img3.jpg" alt="" />
+          <img src="assets/img/img4.jpg" alt="" />
+          <img src="assets/img/img5.jpg" alt="" />
+          <img src="assets/img/img6.jpg" alt="" />
+        </div>
+      </div>
+
+      <section>
+        <h2>Додати тренування</h2>
+        <form action="#" method="post">
+          <label for="date-input">Дата й час тренування:</label>
+          <input
+            type="datetime-local"
+            id="date-input"
+            name="workout-date"
+            required
+          />
+
+          <label for="workout-name">Назва:</label>
+          <input type="text" id="workout-name" name="workout-name" required />
+
+          <label for="workout-type">Тип тренування:</label>
+          <select name="workout-type" id="workout-type">
+            <option value="strength">Силове</option>
+            <option value="cardio">Кардіо</option>
+            <option value="functional">Функціональне</option>
+            <option value="yoga">Йога</option>
+            <option value="team-sport">Командний спорт</option>
+          </select>
+
+          <label for="duration-input">Тривалість (хв):</label>
+          <input
+            type="number"
+            id="duration-input"
+            name="duration"
+            min="1"
+            required
+          />
+
+          <button type="submit">Додати тренування</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Історія тренувань</h2>
+        <article>
+          <h3>Назва:</h3>
+          <p>Дата:</p>
+          <p>Тривалість:</p>
+          <p>Тип:</p>
+        </article>
+      </section>
+    </main>
+
+    <aside aria-label="Статистика за типами тренувань">
+      <figure>
+        <figcaption>
+          <h2>Статистика</h2>
+          <p>Порівняння кількості занять та середнього часу</p>
+        </figcaption>
+
+        <canvas
+          id="workout-chart"
+          role="img"
+          aria-label="Згрупована гістограма: кількість тренувань та середня тривалість у хвилинах за кожним видом спорту"
+        >
+        </canvas>
+
+        <div aria-hidden="true">
+          <span>Кількість занять за типом</span>
+          <span>Середня тривалість (хв)</span>
+        </div>
+      </figure>
+    </aside>
+
+    <footer>
+      <p>
+        &copy; 2026 р. Автор: Назар Мриглод, навчальний проєкт на
+        вебпрограмування
+      </p>
+    </footer>
   </body>
 </html>
