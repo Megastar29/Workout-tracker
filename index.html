@@ -11,6 +11,7 @@
     </header>
 
     <main>
+      <!-- 
       <div aria-hidden="true">
         <div>
           <img src="assets/img/img1.jpg" alt="" />
@@ -21,6 +22,7 @@
           <img src="assets/img/img6.jpg" alt="" />
         </div>
       </div>
+    -->
 
       <section>
         <h2>Додати тренування</h2>
@@ -61,33 +63,43 @@
       <section>
         <h2>Історія тренувань</h2>
         <article>
-          <h3>Назва:</h3>
-          <p>Дата:</p>
-          <p>Тривалість:</p>
-          <p>Тип:</p>
+          <h3>
+            <span>Назва:</span>
+            <span>Теніс</span>
+          </h3>
+
+          <p>
+            <span>Дата:</span>
+            <span>10.09.2026</span>
+          </p>
+
+          <p>
+            <span>Тривалість:</span>
+            <span>40 хв</span>
+          </p>
+
+          <p>
+            <span>Тип:</span>
+            <span>Командний спорт</span>
+          </p>
         </article>
       </section>
     </main>
 
-    <aside aria-label="Статистика за типами тренувань">
-      <figure>
-        <figcaption>
-          <h2>Статистика</h2>
-          <p>Порівняння кількості занять та середнього часу</p>
-        </figcaption>
-
-        <canvas
-          id="workout-chart"
-          role="img"
-          aria-label="Згрупована гістограма: кількість тренувань та середня тривалість у хвилинах за кожним видом спорту"
-        >
-        </canvas>
-
-        <div aria-hidden="true">
-          <span>Кількість занять за типом</span>
-          <span>Середня тривалість (хв)</span>
-        </div>
-      </figure>
+    <aside aria-label="Статистика тренувань">
+      <h2>Статистика</h2>
+      <p>
+        <span>Кількість тренувань:</span>
+        <span>1</span>
+      </p>
+      <p>
+        <span>Загальний час:</span>
+        <span>40 хв</span>
+      </p>
+      <p>
+        <span>Середній час тренування:</span>
+        <span>40 хв</span>
+      </p>
     </aside>
 
     <footer>
