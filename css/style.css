@@ -176,3 +176,16 @@ aside h2 {
     font-weight: 700;
     color: #ff6b00;
 }
+
+footer {
+    padding: 2rem 1.5rem;
+    margin-top: 3rem;
+    border-top: 1px solid #222;
+    text-align: center;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #777;
+}
