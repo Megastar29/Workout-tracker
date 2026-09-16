@@ -4,6 +4,12 @@
   box-sizing: border-box;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
@@ -124,36 +130,6 @@ form {
   margin-bottom: 0;
 } */
 
-@media (min-width: 600px) {
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.layout {
-  max-width: 1200px;
-  margin: 2rem auto 0 auto;
-  padding: 0 2rem;
-}
-
-@media (min-width: 1024px) {
-  .cards {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .layout {
-    display: grid;
-    grid-template-columns: 3fr 1fr;
-    gap: 32px;
-    align-items: start;
-  }
-
-  .statistics-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
-}
-
 .workout-badge {
   display: inline-block;
   padding: 8px;
@@ -194,7 +170,7 @@ aside {
   border-left: 4px solid #ff6b00;
   border-radius: 8px;
   padding: 1.5rem;
-  margin-top: 0;
+  margin-top: 2rem;
   width: 100%;
 }
 
@@ -225,9 +201,11 @@ aside h2 {
 }
 
 .statistics-value {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #ff6b00;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 footer {
@@ -241,4 +219,39 @@ footer p {
   margin: 0;
   font-size: 0.85rem;
   color: #777;
+}
+
+@media (min-width: 600px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.layout {
+  max-width: 1200px;
+  margin: 2rem auto 0 auto;
+  padding: 0 2rem;
+}
+
+@media (min-width: 1024px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  aside {
+    margin-top: 0;
+  }
+
+  /* .statistics-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  } */
 }
