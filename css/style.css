@@ -32,6 +32,19 @@ main {
   padding: 0 1.5rem;
 }
 
+main section {
+  margin-bottom: 2.5rem;
+}
+
+main section:last-of-type {
+  margin-bottom: 0;
+}
+
+main section h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
 form {
   background-color: #1e1e1e;
   padding: 1.5rem;
@@ -167,25 +180,25 @@ aside h2 {
 }
 
 .statistics-label {
-    color: #a0a0a0;
-    font-size: 0.95rem;
+  color: #a0a0a0;
+  font-size: 0.95rem;
 }
 
 .statistics-value {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #ff6b00;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ff6b00;
 }
 
 footer {
-    padding: 2rem 1.5rem;
-    margin-top: 3rem;
-    border-top: 1px solid #222;
-    text-align: center;
+  padding: 2rem 1.5rem;
+  margin-top: 3rem;
+  border-top: 1px solid #222;
+  text-align: center;
 }
 
 footer p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #777;
+  margin: 0;
+  font-size: 0.85rem;
+  color: #777;
 }
