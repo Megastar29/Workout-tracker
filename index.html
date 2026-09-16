@@ -11,120 +11,146 @@
       <h1>Трекер тренувань</h1>
     </header>
 
-    <main>
-      <section>
-        <h2>Додати тренування</h2>
-        <form action="#" method="post">
-          <div class="form-group">
-            <label class="form-label" for="date-input"
-              >Дата й час тренування:</label
-            >
-            <input
-              class="value-input"
-              type="datetime-local"
-              id="date-input"
-              name="workout-date"
-              required
-            />
+    <div class="layout">
+      <main>
+        <section>
+          <h2>Додати тренування</h2>
+          <form action="#" method="post">
+            <div class="form-group">
+              <label class="form-label" for="date-input"
+                >Дата й час тренування:</label
+              >
+              <input
+                class="value-input"
+                type="datetime-local"
+                id="date-input"
+                name="workout-date"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="workout-name">Назва:</label>
+              <input
+                class="value-input"
+                type="text"
+                id="workout-name"
+                name="workout-name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="workout-type"
+                >Тип тренування:</label
+              >
+              <select class="value-input" name="workout-type" id="workout-type">
+                <option value="strength">Силове</option>
+                <option value="cardio">Кардіо</option>
+                <option value="functional">Функціональне</option>
+                <option value="yoga">Йога</option>
+                <option value="team-sport">Командний спорт</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="duration-input"
+                >Тривалість (хв):</label
+              >
+              <input
+                class="value-input"
+                type="number"
+                id="duration-input"
+                name="duration"
+                min="1"
+                required
+              />
+            </div>
+
+            <button class="submit-button" type="submit">
+              Додати тренування
+            </button>
+          </form>
+        </section>
+
+        <section>
+          <h2>Історія тренувань</h2>
+          <div class="cards">
+            <article class="card">
+              <span class="workout-badge" aria-hidden="true">🎾</span>
+
+              <div class="card-content">
+                <h3><span>10.09.2026</span> - <span>Командний спорт</span></h3>
+
+                <p>
+                  <span class="label">Назва:</span>
+                  <span>Теніс</span>
+                </p>
+
+                <p>
+                  <span class="label">Тривалість:</span>
+                  <span>40 хв</span>
+                </p>
+              </div>
+            </article>
+
+            <article class="card">
+              <span class="workout-badge" aria-hidden="true">💓</span>
+
+              <div class="card-content">
+                <h3><span>10.09.2026</span> - <span>Кардіо</span></h3>
+
+                <p>
+                  <span class="label">Назва:</span>
+                  <span>Біг</span>
+                </p>
+
+                <p>
+                  <span class="label">Тривалість:</span>
+                  <span>5 хв</span>
+                </p>
+              </div>
+            </article>
+
+            <article class="card">
+              <span class="workout-badge" aria-hidden="true">🏋️‍♂️</span>
+
+              <div class="card-content">
+                <h3><span>11.09.2026</span> - <span>Силове</span></h3>
+
+                <p>
+                  <span class="label">Назва:</span>
+                  <span>Штанга</span>
+                </p>
+
+                <p>
+                  <span class="label">Тривалість:</span>
+                  <span>30 хв</span>
+                </p>
+              </div>
+            </article>
           </div>
+        </section>
+      </main>
 
-          <div class="form-group">
-            <label class="form-label" for="workout-name">Назва:</label>
-            <input
-              class="value-input"
-              type="text"
-              id="workout-name"
-              name="workout-name"
-              required
-            />
-          </div>
+      <aside aria-labelledby="statistics-heading">
+        <h2 id="statistics-heading">Статистика</h2>
+        <p class="statistics-item">
+          <span class="statistics-label">Кількість тренувань:</span>
+          <span class="statistics-value">3</span>
+        </p>
 
-          <div class="form-group">
-            <label class="form-label" for="workout-type">Тип тренування:</label>
-            <select class="value-input" name="workout-type" id="workout-type">
-              <option value="strength">Силове</option>
-              <option value="cardio">Кардіо</option>
-              <option value="functional">Функціональне</option>
-              <option value="yoga">Йога</option>
-              <option value="team-sport">Командний спорт</option>
-            </select>
-          </div>
+        <p class="statistics-item">
+          <span class="statistics-label">Загальний час:</span>
+          <span class="statistics-value">75 хв</span>
+        </p>
 
-          <div class="form-group">
-            <label class="form-label" for="duration-input"
-              >Тривалість (хв):</label
-            >
-            <input
-              class="value-input"
-              type="number"
-              id="duration-input"
-              name="duration"
-              min="1"
-              required
-            />
-          </div>
-
-          <button class="submit-button" type="submit">Додати тренування</button>
-        </form>
-      </section>
-
-      <section>
-        <h2>Історія тренувань</h2>
-        <article class="card">
-          <span class="workout-badge" aria-hidden="true">🎾</span>
-
-          <div class="card-content">
-            <h3><span>10.09.2026</span> - <span>Командний спорт</span></h3>
-
-            <p>
-              <span class="label">Назва:</span>
-              <span>Теніс</span>
-            </p>
-
-            <p>
-              <span class="label">Тривалість:</span>
-              <span>40 хв</span>
-            </p>
-          </div>
-        </article>
-
-        <article class="card">
-          <span class="workout-badge" aria-hidden="true">💓</span>
-
-          <div class="card-content">
-            <h3><span>10.09.2026</span> - <span>Кардіо</span></h3>
-
-            <p>
-              <span class="label">Назва:</span>
-              <span>Біг</span>
-            </p>
-
-            <p>
-              <span class="label">Тривалість:</span>
-              <span>5 хв</span>
-            </p>
-          </div>
-        </article>
-      </section>
-    </main>
-
-    <aside aria-labelledby="statistics-heading">
-      <h2 id="statistics-heading">Статистика</h2>
-      <p class="statistics-item">
-        <span class="statistics-label">Кількість тренувань:</span>
-        <span class="statistics-value">1</span>
-      </p>
-
-      <p class="statistics-item">
-        <span class="statistics-label">Загальний час:</span>
-        <span class="statistics-value">45 хв</span>
-      </p>
-
-      <p class="statistics-item">
-        <span class="statistics-label">Середній час тренування:</span>
-        <span class="statistics-value">23 хв</span>
-      </p>
-    </aside>
+        <p class="statistics-item">
+          <span class="statistics-label">Середній час тренування:</span>
+          <span class="statistics-value">25 хв</span>
+        </p>
+      </aside>
+    </div>
 
     <footer>
       <p>

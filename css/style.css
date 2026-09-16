@@ -27,9 +27,12 @@ header h1 {
 }
 
 main {
-  max-width: 900px;
+  /* max-width: 900px;
   margin: 2rem auto;
-  padding: 0 1.5rem;
+  padding: 0 1.5rem; */
+  margin: 0;
+  padding: 0;
+  max-width: none;
 }
 
 main section {
@@ -100,19 +103,55 @@ form {
   background-color: #e05e00;
 }
 
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
 .card {
   background-color: #1e1e1e;
   padding: 14px;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
   display: flex;
   align-items: flex-start;
   gap: 12px;
 }
 
-.card:last-child {
+/* .card:last-child {
   margin-bottom: 0;
+} */
+
+@media (min-width: 600px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.layout {
+  max-width: 1200px;
+  margin: 2rem auto 0 auto;
+  padding: 0 2rem;
+}
+
+@media (min-width: 1024px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .statistics-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
 }
 
 .workout-badge {
@@ -155,7 +194,8 @@ aside {
   border-left: 4px solid #ff6b00;
   border-radius: 8px;
   padding: 1.5rem;
-  margin-top: 2rem;
+  margin-top: 0;
+  width: 100%;
 }
 
 aside h2 {
