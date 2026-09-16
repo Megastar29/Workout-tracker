@@ -53,12 +53,14 @@ p {
 
 header {
   background-color: #1e1e1e;
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 0;
   border-bottom: 2px solid #ff6b00;
 }
 
 header h1 {
-  margin: 0;
+  max-width: 1200px;
+  padding: 0 2rem;
+  margin: 0 auto;
   color: #ff6b00;
 }
 
@@ -169,6 +171,7 @@ form {
 }
 
 .card h3 {
+  min-height: 3.9em;
   margin: 0 0 0.25rem 0;
   color: #ff6b00;
 }
