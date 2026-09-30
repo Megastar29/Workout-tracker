@@ -9,6 +9,10 @@ const workouts = [
 ];
 
 const listContainer = document.querySelector("#workouts-list");
+const form = document.querySelector("#workout-form");
+const minutesInput = document.querySelector("#duration-input");
+const caloriesInput = document.querySelector("#calories-input");
+const cpmValue = document.querySelector("#cpm-value");
 
 // Функція для рендеру карток за масивом даних
 function renderCards(workouts) {
@@ -66,9 +70,11 @@ function sumCalories(arr) {
   return sum;
 }
 
+// Функція оновлення прогрес-бару
 function updateProgressBar(workouts) {
   const weeklyGoalText = document.querySelector("#weekly-goal-text");
   const progressBarFill = document.querySelector("#progress-bar-fill");
+  const progressBar = document.querySelector("#progress-bar");
   const targetGoal = 5;
   const currentCount = workouts.length;
 
@@ -80,6 +86,8 @@ function updateProgressBar(workouts) {
   weeklyGoalText.textContent = `${currentCount} / ${targetGoal}`;
   progressBarFill.style.width = `${progressPercent}%`;
   progressBarFill.classList.toggle("completed", currentCount >= targetGoal);
+
+  progressBar.setAttribute("aria-valuenow", progressPercent);
 }
 
 // Функція, яка класифікує тренування за тривалістю
@@ -92,35 +100,11 @@ function classifyTraining(workout) {
 
   return "long";
 }
-// function classifyTrainings(arr) {
-//     const shortTrainingMax = 30;
-
-//     for (let i = 0; i < arr.length; i++) {
-//         if (arr[i].minutes <= shortTrainingMax) {
-//             console.log(arr[i].type + ": " + "Коротке");
-//         } else {
-//             console.log(arr[i].type + ": " + "Довге");
-//         }
-//     }
-// }
 
 // Функція розрахунку кількості спалених калорій за хвилину тренування
 const caloriesPerMinute = (w) => Math.round(w.calories / w.minutes);
 
-// console.log("Сума спалених калорій: " + sumCalories(workouts));
-// classifyTrainings(workouts);
-
-// for (const workout of workouts) {
-//     console.log(
-//         "Тренування: " +
-//             workout.type +
-//             " -> " +
-//             caloriesPerMinute(workout) +
-//             " кал/хв",
-//     );
-// }
-
-const form = document.querySelector("#workout-form");
+// Обробник події відправки даних форми
 form.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -141,6 +125,7 @@ form.addEventListener("submit", (event) => {
   cpmValue.textContent = "0";
 });
 
+// Функція-обробник події введення даних: оновлення розрахунку калорій/хвилину
 function updateCaloriesPerMinutePreview() {
   const durationInput = document.querySelector("#duration-input");
   const minutes = Number(durationInput.value);
@@ -157,13 +142,10 @@ function updateCaloriesPerMinutePreview() {
   }
 }
 
-const minutesInput = document.querySelector("#duration-input");
-const caloriesInput = document.querySelector("#calories-input");
-const cpmValue = document.querySelector("#cpm-value");
-
+// Обробник події введення даних про спалені калорії
 caloriesInput.addEventListener("input", (event) => {
   const caloriesMaxVal = 2000;
-  const caloriesMinVal = 0;
+  const caloriesMinVal = 1;
   if (Number(caloriesInput.value) < caloriesMinVal) {
     caloriesInput.setCustomValidity(
       `Потрібно ввести дані, більші ${caloriesMinVal}`,
@@ -174,6 +156,22 @@ caloriesInput.addEventListener("input", (event) => {
     );
   } else {
     caloriesInput.setCustomValidity("");
+  }
+});
+
+// Обробник події введення даних про тривалість тренування
+minutesInput.addEventListener("input", (event) => {
+  const maxVal = 600;
+  const minVal = 1;
+
+  if (Number(minutesInput.value) > maxVal) {
+    minutesInput.setCustomValidity(
+      `Тривалість не може перевищувати ${maxVal} хв (10 годин)!`,
+    );
+  } else if (Number(minutesInput.value) < minVal) {
+    minutesInput.setCustomValidity("Тривалість має бути щонайменше 1 хв!");
+  } else {
+    minutesInput.setCustomValidity("");
   }
 });
 
