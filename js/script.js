@@ -40,7 +40,7 @@ function updateStatistics(workouts) {
 
   countTrainings.textContent = workouts.length;
   totalTime.textContent = `${sumMinutes(workouts)} хв`;
-  averageTime.textContent = `${Math.round(sumMinutes(workouts) / workouts.length)} хв`;
+  averageTime.textContent = `${workouts.length !== 0 ? Math.round(sumMinutes(workouts) / workouts.length) : 0} хв`;
   totalCaloriesElement.textContent = `${sumCalories(workouts)} ккал`;
 }
 
@@ -122,7 +122,27 @@ form.addEventListener("submit", (event) => {
   form.reset();
 });
 
+function updateCaloriesPerMinutePreview() {
+  const cpmValue = document.querySelector("#cpm-value");
+  const durationInput = document.querySelector("#duration-input");
+  const minutes = Number(durationInput.value);
+  const calories = Number(caloriesInput.value);
+
+  if (minutes > 0 && calories > 0) {
+    cpmValue.textContent = caloriesPerMinute({
+      type: undefined,
+      minutes: minutes,
+      calories: calories,
+    });
+  }
+  else {
+    cpmValue.textContent = "0";
+  }
+}
+
+const minutesInput = document.querySelector("#duration-input");
 const caloriesInput = document.querySelector("#calories-input");
+
 caloriesInput.addEventListener("input", (event) => {
   const caloriesMaxVal = 2000;
   const caloriesMinVal = 0;
@@ -139,6 +159,8 @@ caloriesInput.addEventListener("input", (event) => {
   }
 });
 
+minutesInput.addEventListener("input", updateCaloriesPerMinutePreview);
+caloriesInput.addEventListener("input", updateCaloriesPerMinutePreview);
+
 renderCards(workouts);
 updateStatistics(workouts);
-console.log("test1");
