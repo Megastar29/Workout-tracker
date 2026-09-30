@@ -122,6 +122,23 @@ form.addEventListener("submit", (event) => {
   form.reset();
 });
 
+const caloriesInput = document.querySelector("#calories-input");
+caloriesInput.addEventListener("input", (event) => {
+  const caloriesMaxVal = 2000;
+  const caloriesMinVal = 0;
+  if (Number(caloriesInput.value) < caloriesMinVal) {
+    caloriesInput.setCustomValidity(
+      `Потрібно ввести дані, більші ${caloriesMinVal}`,
+    );
+  } else if (Number(caloriesInput.value) > caloriesMaxVal) {
+    caloriesInput.setCustomValidity(
+      `Завелике число! Треба ввести дані менші за ${caloriesMaxVal}`,
+    );
+  } else {
+    caloriesInput.setCustomValidity("");
+  }
+});
+
 renderCards(workouts);
 updateStatistics(workouts);
 console.log("test1");
