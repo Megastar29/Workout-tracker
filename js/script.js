@@ -42,6 +42,8 @@ function updateStatistics(workouts) {
   totalTime.textContent = `${sumMinutes(workouts)} хв`;
   averageTime.textContent = `${workouts.length !== 0 ? Math.round(sumMinutes(workouts) / workouts.length) : 0} хв`;
   totalCaloriesElement.textContent = `${sumCalories(workouts)} ккал`;
+
+  updateProgressBar(workouts);
 }
 
 // Функція для підрахунку загальної тривалості всіх тренувань у хв
@@ -62,6 +64,22 @@ function sumCalories(arr) {
   }
 
   return sum;
+}
+
+function updateProgressBar(workouts) {
+  const weeklyGoalText = document.querySelector("#weekly-goal-text");
+  const progressBarFill = document.querySelector("#progress-bar-fill");
+  const targetGoal = 5;
+  const currentCount = workouts.length;
+
+  const progressPercent = Math.min(
+    Math.round((currentCount / targetGoal) * 100),
+    100,
+  );
+
+  weeklyGoalText.textContent = `${currentCount} / ${targetGoal}`;
+  progressBarFill.style.width = `${progressPercent}%`;
+  progressBarFill.classList.toggle("completed", currentCount >= targetGoal);
 }
 
 // Функція, яка класифікує тренування за тривалістю
@@ -134,8 +152,7 @@ function updateCaloriesPerMinutePreview() {
       minutes: minutes,
       calories: calories,
     });
-  }
-  else {
+  } else {
     cpmValue.textContent = "0";
   }
 }

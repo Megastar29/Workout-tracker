@@ -307,10 +307,14 @@ aside h2 {
 }
 
 .progress-fill {
-  width: 60%;
   height: 100%;
   background-color: #ff6b00;
   border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.completed {
+  background-color: #4caf50;
 }
 
 footer {
