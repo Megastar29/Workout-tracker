@@ -16,41 +16,23 @@
       <main>
         <section>
           <h2>Додати тренування</h2>
-          <form action="#" method="post">
-            <div class="form-group">
-              <label class="form-label" for="date-input"
-                >Дата й час тренування:</label
-              >
-              <input
-                class="value-input"
-                type="datetime-local"
-                id="date-input"
-                name="workout-date"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="workout-name">Назва:</label>
-              <input
-                class="value-input"
-                type="text"
-                id="workout-name"
-                name="workout-name"
-                required
-              />
-            </div>
-
+          <form id="workout-form" action="#" method="post">
             <div class="form-group">
               <label class="form-label" for="workout-type"
                 >Тип тренування:</label
               >
-              <select class="value-input" name="workout-type" id="workout-type">
-                <option value="strength">Силове</option>
-                <option value="cardio">Кардіо</option>
-                <option value="functional">Функціональне</option>
-                <option value="yoga">Йога</option>
-                <option value="team-sport">Командний спорт</option>
+              <select
+                class="value-input"
+                name="type"
+                id="workout-type"
+                required
+              >
+                <option value="" disabled selected>Оберіть тип</option>
+                <option value="Силове">Силове</option>
+                <option value="Кардіо">Кардіо</option>
+                <option value="Функціональне">Функціональне</option>
+                <option value="Йога">Йога</option>
+                <option value="Командний спорт">Командний спорт</option>
               </select>
             </div>
 
@@ -62,11 +44,39 @@
                 class="value-input"
                 type="number"
                 id="duration-input"
-                name="duration"
+                name="minutes"
                 min="1"
                 required
               />
             </div>
+
+            <div class="form-group">
+              <label class="form-label" for="calories-input"
+                >Спалені калорії (ккал):</label
+              >
+              <input
+                class="value-input"
+                type="number"
+                id="calories-input"
+                name="calories"
+                min="1"
+                required
+              />
+            </div>
+
+            <!--
+            <div class="form-group">
+              <label class="form-label" for="date-input"
+                >Дата й час тренування:</label
+              >
+              <input
+                class="value-input"
+                type="datetime-local"
+                id="date-input"
+                name="workout-date"
+              />
+            </div>
+          -->
 
             <button class="submit-button" type="submit">
               Додати тренування

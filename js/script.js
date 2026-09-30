@@ -102,5 +102,26 @@ const caloriesPerMinute = (w) => Math.round(w.calories / w.minutes);
 //     );
 // }
 
+const form = document.querySelector("#workout-form");
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const typeSelect = document.querySelector("#workout-type");
+  const durationInput = document.querySelector("#duration-input");
+  const caloriesInput = document.querySelector("#calories-input");
+
+  const type = typeSelect.value;
+  const duration = Number(durationInput.value);
+  const calories = Number(caloriesInput.value);
+
+  const newTraining = { type: type, minutes: duration, calories: calories };
+  workouts.push(newTraining);
+  renderCards(workouts);
+  updateStatistics(workouts);
+
+  form.reset();
+});
+
 renderCards(workouts);
 updateStatistics(workouts);
+console.log("test1");
