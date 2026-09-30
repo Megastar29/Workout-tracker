@@ -120,10 +120,10 @@ form.addEventListener("submit", (event) => {
   updateStatistics(workouts);
 
   form.reset();
+  cpmValue.textContent = "0";
 });
 
 function updateCaloriesPerMinutePreview() {
-  const cpmValue = document.querySelector("#cpm-value");
   const durationInput = document.querySelector("#duration-input");
   const minutes = Number(durationInput.value);
   const calories = Number(caloriesInput.value);
@@ -142,6 +142,7 @@ function updateCaloriesPerMinutePreview() {
 
 const minutesInput = document.querySelector("#duration-input");
 const caloriesInput = document.querySelector("#calories-input");
+const cpmValue = document.querySelector("#cpm-value");
 
 caloriesInput.addEventListener("input", (event) => {
   const caloriesMaxVal = 2000;
