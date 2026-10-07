@@ -35,13 +35,7 @@ function renderCards(workouts) {
       card.dataset.calories = workout.calories;
       card.classList.add(classifyTraining(workout));
     }
-
-    // type.textContent = workout.type;
-    // details.textContent = `${workout.minutes} хв, ${workout.calories} ккал`;
-
-    // card.dataset.calories = workout.calories;
     card.classList.add("card");
-    // card.classList.add(classifyTraining(workout));
 
     card.append(type);
     card.append(details);
@@ -192,7 +186,37 @@ minutesInput.addEventListener("input", (event) => {
 minutesInput.addEventListener("input", updateCaloriesPerMinutePreview);
 caloriesInput.addEventListener("input", updateCaloriesPerMinutePreview);
 
+const refreshButton = document.querySelector("#refresh-button");
+const statusMessage = document.querySelector("#status-message");
+
+// Функція для відображення статусу завантаження для користувача
+function showLoading(isLoading) {
+  if (isLoading) {
+    statusMessage.textContent = "Завантаження тренувань...";
+    statusMessage.classList.remove("error");
+    statusMessage.classList.add("visible", "loading");
+  } else {
+    statusMessage.classList.remove("loading");
+    if (!statusMessage.classList.contains("error")) {
+      statusMessage.classList.remove("visible");
+      statusMessage.textContent = "";
+    }
+  }
+
+  refreshButton.disabled = isLoading;
+}
+
+// Функція для відображення помилки для користувача
+function showError(message) {
+  statusMessage.textContent = message;
+  statusMessage.classList.remove("loading");
+  statusMessage.classList.add("visible", "error");
+}
+
+// Функція завантаження даних із API
 async function loadData() {
+  showLoading(true);
+
   try {
     const response = await fetch(URL);
     if (!response.ok) {
@@ -203,9 +227,17 @@ async function loadData() {
     renderCards(data);
     console.log(data);
   } catch (error) {
-    console.error(error);
+    showError("Журнал тренувань недоступний офлайн");
+    console.error("Помилка завантаження даних:", error);
+  } finally {
+    showLoading(false);
   }
 }
+
+// Додаємо обробник події на натискання кнопки
+refreshButton.addEventListener("click", () => {
+  loadData();
+});
 
 renderCards(workouts);
 updateStatistics(workouts);

@@ -65,20 +65,6 @@
               />
             </div>
 
-            <!--
-            <div class="form-group">
-              <label class="form-label" for="date-input"
-                >Дата й час тренування:</label
-              >
-              <input
-                class="value-input"
-                type="datetime-local"
-                id="date-input"
-                name="workout-date"
-              />
-            </div>
-          -->
-
             <p id="cpm-preview">
               <span>Інтенсивність: </span>
               <span><strong id="cpm-value">0</strong> ккал/хв</span>
@@ -91,7 +77,15 @@
         </section>
 
         <section>
-          <h2>Історія тренувань</h2>
+          <div class="section-header">
+            <h2>Історія тренувань</h2>
+            <button id="refresh-button" class="refresh-button" type="button">
+              Оновити
+            </button>
+          </div>
+
+          <p id="status-message" class="status-message" aria-live="polite"></p>
+
           <div id="workouts-list" class="cards">
             <article class="card">
               <span class="workout-badge" aria-hidden="true">🎾</span>

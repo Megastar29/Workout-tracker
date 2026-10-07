@@ -158,6 +158,63 @@ form {
   font-weight: 700;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+/* Кнопка "Оновити" */
+.refresh-button {
+  background-color: transparent;
+  border: 1px solid #ff6b00;
+  color: #ff6b00;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refresh-button:hover:not(:disabled) {
+  background-color: #ff6b00;
+  color: #121212;
+}
+
+/* Стан disabled під час завантаження (Крок 7) */
+.refresh-button:disabled {
+  border-color: #555;
+  color: #555;
+  cursor: not-allowed;
+}
+
+/* Повідомлення стану (Крок 7 і 8) */
+.status-message {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  display: none;
+}
+
+.status-message.visible {
+  display: block;
+}
+
+.status-message.loading {
+  color: #a0a0a0;
+}
+
+/* Стиль помилки (Крок 8) */
+.status-message.error {
+  color: #ff5252;
+  font-weight: 500;
+}
+
 .cards {
   display: grid;
   grid-template-columns: 1fr;
