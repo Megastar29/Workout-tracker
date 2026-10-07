@@ -24,15 +24,11 @@ function renderCards(workouts) {
     const type = document.createElement("h3");
     const details = document.createElement("p");
 
-    // Перевіряємо: це дані з API (JSONPlaceholder) чи локальні тренування з форми
     if ("title" in workout) {
       type.textContent = workout.title;
-      details.textContent = workout.completed
-        ? "Статус: Виконано"
-        : "Статус: У процесі";
+      details.textContent = workout.completed ? "✓ Виконано" : "⏳ У процесі";
 
-      // Можна візуалізувати статус через класи короткого/довгого тренування
-      card.classList.add(workout.completed ? "short" : "long");
+      card.classList.add(workout.completed ? "completed" : "not-completed");
     } else {
       type.textContent = workout.type;
       details.textContent = `${workout.minutes} хв, ${workout.calories} ккал`;

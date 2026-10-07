@@ -248,6 +248,18 @@ form {
   border-left: 4px solid #ff6b00;
 }
 
+.card.completed {
+  border-left: 4px solid #4caf50;
+}
+
+.card.completed h3 {
+  color: #f5f5f5;
+}
+
+.card.not-completed {
+  border-left: 4px solid #ff6b00;
+}
+
 aside {
   background-color: #1e1e1e;
   border: 1px solid #333;
