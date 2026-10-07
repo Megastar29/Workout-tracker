@@ -8,6 +8,8 @@ const workouts = [
   { type: "Силове", minutes: 30, calories: 800 },
 ];
 
+const URL = "https://jsonplaceholder.typicode.com/todos?userId=4";
+
 const listContainer = document.querySelector("#workouts-list");
 const form = document.querySelector("#workout-form");
 const minutesInput = document.querySelector("#duration-input");
@@ -22,12 +24,28 @@ function renderCards(workouts) {
     const type = document.createElement("h3");
     const details = document.createElement("p");
 
-    type.textContent = workout.type;
-    details.textContent = `${workout.minutes} хв, ${workout.calories} ккал`;
+    // Перевіряємо: це дані з API (JSONPlaceholder) чи локальні тренування з форми
+    if ("title" in workout) {
+      type.textContent = workout.title;
+      details.textContent = workout.completed
+        ? "Статус: Виконано"
+        : "Статус: У процесі";
 
-    card.dataset.calories = workout.calories;
+      // Можна візуалізувати статус через класи короткого/довгого тренування
+      card.classList.add(workout.completed ? "short" : "long");
+    } else {
+      type.textContent = workout.type;
+      details.textContent = `${workout.minutes} хв, ${workout.calories} ккал`;
+      card.dataset.calories = workout.calories;
+      card.classList.add(classifyTraining(workout));
+    }
+
+    // type.textContent = workout.type;
+    // details.textContent = `${workout.minutes} хв, ${workout.calories} ккал`;
+
+    // card.dataset.calories = workout.calories;
     card.classList.add("card");
-    card.classList.add(classifyTraining(workout));
+    // card.classList.add(classifyTraining(workout));
 
     card.append(type);
     card.append(details);
@@ -178,5 +196,21 @@ minutesInput.addEventListener("input", (event) => {
 minutesInput.addEventListener("input", updateCaloriesPerMinutePreview);
 caloriesInput.addEventListener("input", updateCaloriesPerMinutePreview);
 
+async function loadData() {
+  try {
+    const response = await fetch(URL);
+    if (!response.ok) {
+      throw new Error(`Код ${response.status}`);
+    }
+
+    const data = await response.json();
+    renderCards(data);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 renderCards(workouts);
 updateStatistics(workouts);
+loadData();
