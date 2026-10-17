@@ -270,6 +270,36 @@ form {
   border-left: 4px solid #ff6b00;
 }
 
+/* Шапка картки */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Кнопка видалення */
+.card-delete-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.2s ease;
+}
+
+.card-delete-btn:hover {
+  color: #ff5252; /* червоний акцент при наведенні */
+}
+
+/* Похідне значення інтенсивності */
+.card-intensity {
+  color: #ff6b00;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
 aside {
   background-color: #1e1e1e;
   border: 1px solid #333;

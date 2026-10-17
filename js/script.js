@@ -1,12 +1,71 @@
 // Очищення статичних карток article
-const allCards = document.querySelectorAll(".card");
-allCards.forEach((x) => x.remove());
+// const allCards = document.querySelectorAll(".card");
+// allCards.forEach((x) => x.remove());
 
-const workouts = [
-  { type: "Командний спорт", minutes: 40, calories: 600 },
-  { type: "Кардіо", minutes: 15, calories: 100 },
-  { type: "Силове", minutes: 30, calories: 800 },
-];
+// Закоментовано, оскільки тепер дані переведені у реактивний у Vue
+// const workouts = [
+//   { type: "Командний спорт", minutes: 40, calories: 600 },
+//   { type: "Кардіо", minutes: 15, calories: 100 },
+//   { type: "Силове", minutes: 30, calories: 800 },
+// ];
+
+// Компонент даних
+const WorkoutRow = {
+  props: ["id", "type", "minutes", "calories"],
+  emits: ["delete-workout"],
+
+  computed: {
+    caloriesPerMinute() {
+      if (!this.minutes || this.minutes === 0) return 0;
+      return (this.calories / this.minutes).toFixed(1);
+    },
+  },
+
+  template: `
+    <article class="card">
+      <div class="card-header">
+        <h3>{{ type }}</h3>
+        <button 
+          type="button" 
+          class="card-delete-btn"
+          @click="$emit('delete-workout', id)" 
+          title="Видалити"
+        >&times;</button>
+      </div>
+      <p>{{ minutes }} хв, {{ calories }} ккал</p>
+      <p class="card-intensity">{{ caloriesPerMinute }} ккал/хв</p>
+    </article>
+  `,
+};
+
+/*
+ * Обраний фреймворк: Vue 3 (CDN, декларативний підхід).
+ * Причина вибору: швидка інтеграція без необхідності налаштування складних
+ * збирачів (Vite/Webpack), зручна робота з реактивними даними та наявність
+ * computed properties для автоматичного обчислення похідного значення (ккал/хв).
+ */
+// Робота із Vue - створення додатку
+Vue.createApp({
+  components: {
+    WorkoutRow,
+  },
+
+  data() {
+    return {
+      workouts: [
+        { id: 1, type: "Командний спорт", minutes: 40, calories: 600 },
+        { id: 2, type: "Кардіо", minutes: 15, calories: 100 },
+        { id: 3, type: "Силове", minutes: 30, calories: 800 },
+      ],
+    };
+  },
+
+  methods: {
+    removeWorkout(id) {
+      this.workouts = this.workouts.filter((w) => w.id !== id);
+    },
+  },
+}).mount("#app");
 
 const URL = "https://jsonplaceholder.typicode.com/todos?userId=4";
 
@@ -16,32 +75,33 @@ const minutesInput = document.querySelector("#duration-input");
 const caloriesInput = document.querySelector("#calories-input");
 const cpmValue = document.querySelector("#cpm-value");
 
+// Закоментовано, оскільки тепер рендер замінено компонентом WorkoutRow у Vue
 // Функція для рендеру карток за масивом даних
-function renderCards(workouts) {
-  listContainer.innerHTML = "";
-  for (const workout of workouts) {
-    const card = document.createElement("article");
-    const type = document.createElement("h3");
-    const details = document.createElement("p");
+// function renderCards(workouts) {
+//   listContainer.innerHTML = "";
+//   for (const workout of workouts) {
+//     const card = document.createElement("article");
+//     const type = document.createElement("h3");
+//     const details = document.createElement("p");
 
-    if ("title" in workout) {
-      type.textContent = workout.title;
-      details.textContent = workout.completed ? "✓ Виконано" : "⏳ У процесі";
+//     if ("title" in workout) {
+//       type.textContent = workout.title;
+//       details.textContent = workout.completed ? "✓ Виконано" : "⏳ У процесі";
 
-      card.classList.add(workout.completed ? "completed" : "not-completed");
-    } else {
-      type.textContent = workout.type;
-      details.textContent = `${workout.minutes} хв, ${workout.calories} ккал`;
-      card.dataset.calories = workout.calories;
-      card.classList.add(classifyTraining(workout));
-    }
-    card.classList.add("card");
+//       card.classList.add(workout.completed ? "completed" : "not-completed");
+//     } else {
+//       type.textContent = workout.type;
+//       details.textContent = `${workout.minutes} хв, ${workout.calories} ккал`;
+//       card.dataset.calories = workout.calories;
+//       card.classList.add(classifyTraining(workout));
+//     }
+//     card.classList.add("card");
 
-    card.append(type);
-    card.append(details);
-    listContainer.append(card);
-  }
-}
+//     card.append(type);
+//     card.append(details);
+//     listContainer.append(card);
+//   }
+// }
 
 // Функція для оновлення числових полів статистики
 function updateStatistics(workouts) {
@@ -239,6 +299,7 @@ refreshButton.addEventListener("click", () => {
   loadData();
 });
 
-renderCards(workouts);
-updateStatistics(workouts);
-loadData();
+// Закоментовано, оскільки тепер рендер замінено компонентом WorkoutRow у Vue
+// renderCards(workouts);
+// updateStatistics(workouts);
+//loadData();

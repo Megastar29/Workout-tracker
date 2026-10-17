@@ -13,7 +13,7 @@
       <h1>Трекер тренувань</h1>
     </header>
 
-    <div class="layout">
+    <div class="layout" id="app">
       <main>
         <section>
           <h2>Додати тренування</h2>
@@ -88,7 +88,17 @@
           <p id="status-message" class="status-message" aria-live="polite"></p>
 
           <div id="workouts-list" class="cards">
-            <article class="card">
+            <workout-row
+              v-for="workout in workouts"
+              :id="workout.id"
+              :key="workout.id"
+              :type="workout.type"
+              :minutes="workout.minutes"
+              :calories="workout.calories"
+              @delete-workout="removeWorkout"
+            ></workout-row>
+
+            <!-- <article class="card">
               <span class="workout-badge" aria-hidden="true">🎾</span>
 
               <div class="card-content">
@@ -149,7 +159,7 @@
                   <span>30 хв</span>
                 </p>
               </div>
-            </article>
+            </article> -->
           </div>
         </section>
       </main>
