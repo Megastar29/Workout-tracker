@@ -169,7 +169,6 @@ form {
   margin: 0;
 }
 
-/* Кнопка "Оновити" */
 .refresh-button {
   background-color: transparent;
   border: 1px solid #ff6b00;
@@ -187,14 +186,12 @@ form {
   color: #121212;
 }
 
-/* Стан disabled під час завантаження (Крок 7) */
 .refresh-button:disabled {
   border-color: #555;
   color: #555;
   cursor: not-allowed;
 }
 
-/* Повідомлення стану (Крок 7 і 8) */
 .status-message {
   margin: 0 0 1rem 0;
   font-size: 0.95rem;
@@ -209,7 +206,6 @@ form {
   color: #a0a0a0;
 }
 
-/* Стиль помилки (Крок 8) */
 .status-message.error {
   color: #ff5252;
   font-weight: 500;
@@ -220,49 +216,6 @@ form {
   grid-template-columns: 1fr;
   gap: 1rem;
 }
-
-/* 
-.card {
-  background-color: #1e1e1e;
-  padding: 14px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.workout-badge {
-  display: inline-block;
-  padding: 8px;
-  background-color: rgba(255, 107, 0, 0.15);
-  border: 1px solid #ff6b00;
-  border-radius: 6px;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.card h3 {
-  min-height: 3.9em;
-  margin: 0 0 0.25rem 0;
-  color: #ff6b00;
-}
-
-.card p {
-  margin: 0;
-  color: #f5f5f5;
-}
-
-.card .label {
-  color: #a0a0a0;
-  margin-right: 0.25rem;
-} */
 
 .card {
   background-color: #1e1e1e;
