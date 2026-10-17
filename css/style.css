@@ -116,6 +116,10 @@ form {
   font-size: 1rem;
 }
 
+.value-input[type="date"] {
+  color-scheme: dark;
+}
+
 .value-input:focus {
   outline: none;
   border-color: #ff6b00;

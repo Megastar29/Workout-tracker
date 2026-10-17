@@ -1,107 +1,105 @@
-// Очищення статичних карток article
-// const allCards = document.querySelectorAll(".card");
-// allCards.forEach((x) => x.remove());
+//Очищення статичних карток article
+const allCards = document.querySelectorAll(".card");
+allCards.forEach((x) => x.remove());
 
-// Закоментовано, оскільки тепер дані переведені у реактивний у Vue
-// const workouts = [
-//   { type: "Командний спорт", minutes: 40, calories: 600 },
-//   { type: "Кардіо", minutes: 15, calories: 100 },
-//   { type: "Силове", minutes: 30, calories: 800 },
-// ];
+let workouts = [
+  { id: 1, type: "Командний спорт", duration: 40, date: "2026-10-12"},
+  { id: 2, type: "Кардіо", duration: 15, date: "2026-10-14"},
+  { id: 3, type: "Силове", duration: 30, date: "2026-10-17"},
+];
 
-// Компонент даних
-const WorkoutRow = {
-  props: ["id", "type", "minutes", "calories"],
-  emits: ["delete-workout"],
+// // Компонент даних
+// const WorkoutRow = {
+//   props: ["id", "type", "minutes", "calories"],
+//   emits: ["delete-workout"],
 
-  computed: {
-    caloriesPerMinute() {
-      if (!this.minutes || this.minutes === 0) return 0;
-      return (this.calories / this.minutes).toFixed(1);
-    },
-  },
+//   computed: {
+//     caloriesPerMinute() {
+//       if (!this.minutes || this.minutes === 0) return 0;
+//       return (this.calories / this.minutes).toFixed(1);
+//     },
+//   },
 
-  template: `
-    <article class="card">
-      <div class="card-header">
-        <h3>{{ type }}</h3>
-        <button 
-          type="button" 
-          class="card-delete-btn"
-          @click="$emit('delete-workout', id)" 
-          title="Видалити"
-        >&times;</button>
-      </div>
-      <p>{{ minutes }} хв, {{ calories }} ккал</p>
-      <p class="card-intensity">{{ caloriesPerMinute }} ккал/хв</p>
-    </article>
-  `,
-};
+//   template: `
+//     <article class="card">
+//       <div class="card-header">
+//         <h3>{{ type }}</h3>
+//         <button 
+//           type="button" 
+//           class="card-delete-btn"
+//           @click="$emit('delete-workout', id)" 
+//           title="Видалити"
+//         >&times;</button>
+//       </div>
+//       <p>{{ minutes }} хв, {{ calories }} ккал</p>
+//       <p class="card-intensity">{{ caloriesPerMinute }} ккал/хв</p>
+//     </article>
+//   `,
+// };
 
-/*
- * Обраний фреймворк: Vue 3 (CDN, декларативний підхід).
- * Причина вибору: швидка інтеграція без необхідності налаштування складних
- * збирачів (Vite/Webpack), зручна робота з реактивними даними та наявність
- * computed properties для автоматичного обчислення похідного значення (ккал/хв).
- */
-// Робота із Vue - створення додатку
-Vue.createApp({
-  components: {
-    WorkoutRow,
-  },
+// /*
+//  * Обраний фреймворк: Vue 3 (CDN, декларативний підхід).
+//  * Причина вибору: швидка інтеграція без необхідності налаштування складних
+//  * збирачів (Vite/Webpack), зручна робота з реактивними даними та наявність
+//  * computed properties для автоматичного обчислення похідного значення (ккал/хв).
+//  */
+// // Робота із Vue - створення додатку
+// Vue.createApp({
+//   components: {
+//     WorkoutRow,
+//   },
 
-  data() {
-    return {
-      workouts: [
-        { id: 1, type: "Командний спорт", minutes: 40, calories: 600 },
-        { id: 2, type: "Кардіо", minutes: 15, calories: 100 },
-        { id: 3, type: "Силове", minutes: 30, calories: 800 },
-      ],
-    };
-  },
+//   data() {
+//     return {
+//       workouts: [
+//         { id: 1, type: "Командний спорт", minutes: 40, calories: 600 },
+//         { id: 2, type: "Кардіо", minutes: 15, calories: 100 },
+//         { id: 3, type: "Силове", minutes: 30, calories: 800 },
+//       ],
+//     };
+//   },
 
-  methods: {
-    removeWorkout(id) {
-      this.workouts = this.workouts.filter((w) => w.id !== id);
-    },
-  },
-}).mount("#app");
+//   methods: {
+//     removeWorkout(id) {
+//       this.workouts = this.workouts.filter((w) => w.id !== id);
+//     },
+//   },
+// }).mount("#app");
 
 const URL = "https://jsonplaceholder.typicode.com/todos?userId=4";
 
 const listContainer = document.querySelector("#workouts-list");
 const form = document.querySelector("#workout-form");
 const minutesInput = document.querySelector("#duration-input");
-const caloriesInput = document.querySelector("#calories-input");
-const cpmValue = document.querySelector("#cpm-value");
+//const caloriesInput = document.querySelector("#calories-input");
+//const cpmValue = document.querySelector("#cpm-value");
 
-// Закоментовано, оскільки тепер рендер замінено компонентом WorkoutRow у Vue
-// Функція для рендеру карток за масивом даних
-// function renderCards(workouts) {
-//   listContainer.innerHTML = "";
-//   for (const workout of workouts) {
-//     const card = document.createElement("article");
-//     const type = document.createElement("h3");
-//     const details = document.createElement("p");
+//Функція для рендеру карток за масивом даних
+function renderCards(workouts) {
+  listContainer.innerHTML = "";
+  for (const workout of workouts) {
+    const card = document.createElement("article");
+    const type = document.createElement("h3");
+    const details = document.createElement("p");
 
-//     if ("title" in workout) {
-//       type.textContent = workout.title;
-//       details.textContent = workout.completed ? "✓ Виконано" : "⏳ У процесі";
+    if ("title" in workout) {
+      type.textContent = workout.title;
+      details.textContent = workout.completed ? "✓ Виконано" : "⏳ У процесі";
 
-//       card.classList.add(workout.completed ? "completed" : "not-completed");
-//     } else {
-//       type.textContent = workout.type;
-//       details.textContent = `${workout.minutes} хв, ${workout.calories} ккал`;
-//       card.dataset.calories = workout.calories;
-//       card.classList.add(classifyTraining(workout));
-//     }
-//     card.classList.add("card");
+      card.classList.add(workout.completed ? "completed" : "not-completed");
+    } else {
+      type.textContent = workout.type;
+      details.textContent = `${workout.duration} хв • ${workout.date}`;
+      card.dataset.calories = workout.calories;
+      card.classList.add(classifyTraining(workout));
+    }
+    card.classList.add("card");
 
-//     card.append(type);
-//     card.append(details);
-//     listContainer.append(card);
-//   }
-// }
+    card.append(type);
+    card.append(details);
+    listContainer.append(card);
+  }
+}
 
 // Функція для оновлення числових полів статистики
 function updateStatistics(workouts) {
@@ -122,7 +120,7 @@ function updateStatistics(workouts) {
 function sumMinutes(arr) {
   let sum = 0;
   for (const item of arr) {
-    sum += item.minutes;
+    sum += item.duration;
   }
 
   return sum;
@@ -162,7 +160,7 @@ function updateProgressBar(workouts) {
 function classifyTraining(workout) {
   const shortTrainingMax = 30;
 
-  if (workout.minutes <= shortTrainingMax) {
+  if (workout.duration <= shortTrainingMax) {
     return "short";
   }
 
@@ -170,7 +168,7 @@ function classifyTraining(workout) {
 }
 
 // Функція розрахунку кількості спалених калорій за хвилину тренування
-const caloriesPerMinute = (w) => Math.round(w.calories / w.minutes);
+const caloriesPerMinute = (w) => Math.round(w.calories / w.duration);
 
 // Обробник події відправки даних форми
 form.addEventListener("submit", (event) => {
@@ -184,48 +182,48 @@ form.addEventListener("submit", (event) => {
   const duration = Number(durationInput.value);
   const calories = Number(caloriesInput.value);
 
-  const newTraining = { type: type, minutes: duration, calories: calories };
+  const newTraining = { type: type, duration: duration, calories: calories };
   workouts.push(newTraining);
   renderCards(workouts);
   updateStatistics(workouts);
 
   form.reset();
-  cpmValue.textContent = "0";
+  //cpmValue.textContent = "0";
 });
 
 // Функція-обробник події введення даних: оновлення розрахунку калорій/хвилину
-function updateCaloriesPerMinutePreview() {
-  const durationInput = document.querySelector("#duration-input");
-  const minutes = Number(durationInput.value);
-  const calories = Number(caloriesInput.value);
+// function updateCaloriesPerMinutePreview() {
+//   const durationInput = document.querySelector("#duration-input");
+//   const minutes = Number(durationInput.value);
+//   const calories = Number(caloriesInput.value);
 
-  if (minutes > 0 && calories > 0) {
-    cpmValue.textContent = caloriesPerMinute({
-      type: undefined,
-      minutes: minutes,
-      calories: calories,
-    });
-  } else {
-    cpmValue.textContent = "0";
-  }
-}
+//   if (minutes > 0 && calories > 0) {
+//     cpmValue.textContent = caloriesPerMinute({
+//       type: undefined,
+//       duration: minutes,
+//       calories: calories,
+//     });
+//   } else {
+//     cpmValue.textContent = "0";
+//   }
+// }
 
 // Обробник події введення даних про спалені калорії
-caloriesInput.addEventListener("input", (event) => {
-  const caloriesMaxVal = 2000;
-  const caloriesMinVal = 1;
-  if (Number(caloriesInput.value) < caloriesMinVal) {
-    caloriesInput.setCustomValidity(
-      `Потрібно ввести дані, більші ${caloriesMinVal}`,
-    );
-  } else if (Number(caloriesInput.value) > caloriesMaxVal) {
-    caloriesInput.setCustomValidity(
-      `Завелике число! Треба ввести дані менші за ${caloriesMaxVal}`,
-    );
-  } else {
-    caloriesInput.setCustomValidity("");
-  }
-});
+// caloriesInput.addEventListener("input", (event) => {
+//   const caloriesMaxVal = 2000;
+//   const caloriesMinVal = 1;
+//   if (Number(caloriesInput.value) < caloriesMinVal) {
+//     caloriesInput.setCustomValidity(
+//       `Потрібно ввести дані, більші ${caloriesMinVal}`,
+//     );
+//   } else if (Number(caloriesInput.value) > caloriesMaxVal) {
+//     caloriesInput.setCustomValidity(
+//       `Завелике число! Треба ввести дані менші за ${caloriesMaxVal}`,
+//     );
+//   } else {
+//     caloriesInput.setCustomValidity("");
+//   }
+// });
 
 // Обробник події введення даних про тривалість тренування
 minutesInput.addEventListener("input", (event) => {
@@ -243,8 +241,8 @@ minutesInput.addEventListener("input", (event) => {
   }
 });
 
-minutesInput.addEventListener("input", updateCaloriesPerMinutePreview);
-caloriesInput.addEventListener("input", updateCaloriesPerMinutePreview);
+//minutesInput.addEventListener("input", updateCaloriesPerMinutePreview);
+//caloriesInput.addEventListener("input", updateCaloriesPerMinutePreview);
 
 const refreshButton = document.querySelector("#refresh-button");
 const statusMessage = document.querySelector("#status-message");
@@ -299,7 +297,6 @@ refreshButton.addEventListener("click", () => {
   loadData();
 });
 
-// Закоментовано, оскільки тепер рендер замінено компонентом WorkoutRow у Vue
-// renderCards(workouts);
-// updateStatistics(workouts);
+renderCards(workouts);
+updateStatistics(workouts);
 //loadData();
