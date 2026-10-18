@@ -149,7 +149,9 @@ function updateProgressBar(workouts) {
   const progressBarFill = document.querySelector("#progress-bar-fill");
   const progressBar = document.querySelector("#progress-bar");
   const targetGoal = 5;
-  const currentCount = workouts.length;
+
+  const weeklyWorkouts = workouts.filter((item) => isWithinCurrentWeek(item.date));
+  const currentCount = weeklyWorkouts.length;
 
   const progressPercent = Math.min(
     Math.round((currentCount / targetGoal) * 100),
@@ -265,58 +267,58 @@ minutesInput.addEventListener("input", (event) => {
 //minutesInput.addEventListener("input", updateCaloriesPerMinutePreview);
 //caloriesInput.addEventListener("input", updateCaloriesPerMinutePreview);
 
-const refreshButton = document.querySelector("#refresh-button");
-const statusMessage = document.querySelector("#status-message");
+// const refreshButton = document.querySelector("#refresh-button");
+// const statusMessage = document.querySelector("#status-message");
 
 // Функція для відображення статусу завантаження для користувача
-function showLoading(isLoading) {
-  if (isLoading) {
-    statusMessage.textContent = "Завантаження тренувань...";
-    statusMessage.classList.remove("error");
-    statusMessage.classList.add("visible", "loading");
-  } else {
-    statusMessage.classList.remove("loading");
-    if (!statusMessage.classList.contains("error")) {
-      statusMessage.classList.remove("visible");
-      statusMessage.textContent = "";
-    }
-  }
+// function showLoading(isLoading) {
+//   if (isLoading) {
+//     statusMessage.textContent = "Завантаження тренувань...";
+//     statusMessage.classList.remove("error");
+//     statusMessage.classList.add("visible", "loading");
+//   } else {
+//     statusMessage.classList.remove("loading");
+//     if (!statusMessage.classList.contains("error")) {
+//       statusMessage.classList.remove("visible");
+//       statusMessage.textContent = "";
+//     }
+//   }
 
-  refreshButton.disabled = isLoading;
-}
+//   refreshButton.disabled = isLoading;
+// }
 
 // Функція для відображення помилки для користувача
-function showError(message) {
-  statusMessage.textContent = message;
-  statusMessage.classList.remove("loading");
-  statusMessage.classList.add("visible", "error");
-}
+// function showError(message) {
+//   statusMessage.textContent = message;
+//   statusMessage.classList.remove("loading");
+//   statusMessage.classList.add("visible", "error");
+// }
 
 // Функція завантаження даних із API
-async function loadData() {
-  showLoading(true);
+// async function loadData() {
+//   showLoading(true);
 
-  try {
-    const response = await fetch(URL);
-    if (!response.ok) {
-      throw new Error(`Код ${response.status}`);
-    }
+//   try {
+//     const response = await fetch(URL);
+//     if (!response.ok) {
+//       throw new Error(`Код ${response.status}`);
+//     }
 
-    const data = await response.json();
-    renderCards(data);
-    console.log(data);
-  } catch (error) {
-    showError("Журнал тренувань недоступний офлайн");
-    console.error("Помилка завантаження даних:", error);
-  } finally {
-    showLoading(false);
-  }
-}
+//     const data = await response.json();
+//     renderCards(data);
+//     console.log(data);
+//   } catch (error) {
+//     showError("Журнал тренувань недоступний офлайн");
+//     console.error("Помилка завантаження даних:", error);
+//   } finally {
+//     showLoading(false);
+//   }
+// }
 
 // Додаємо обробник події на натискання кнопки
-refreshButton.addEventListener("click", () => {
-  loadData();
-});
+// refreshButton.addEventListener("click", () => {
+//   loadData();
+// });
 
 renderCards(workouts);
 updateStatistics(workouts);
