@@ -17,7 +17,12 @@
       <main>
         <section>
           <h2>Додати тренування</h2>
-          <form id="workout-form" action="#" method="post">
+          <form
+            id="workout-form"
+            action="#"
+            method="post"
+            @submit.prevent="addWorkout"
+          >
             <div class="form-group">
               <label class="form-label" for="workout-type"
                 >Тип тренування:</label
@@ -26,6 +31,7 @@
                 class="value-input"
                 name="type"
                 id="workout-type"
+                v-model="form.type"
                 required
               >
                 <option value="" disabled selected>Оберіть тип</option>
@@ -46,6 +52,7 @@
                 type="number"
                 id="duration-input"
                 name="minutes"
+                v-model.number="form.minutes"
                 min="1"
                 max="600"
                 required
@@ -61,14 +68,19 @@
                 type="number"
                 id="calories-input"
                 name="calories"
+                v-model.number="form.calories"
                 min="1"
+                max="2000"
                 required
               />
             </div>
 
             <p id="cpm-preview">
               <span>Інтенсивність: </span>
-              <span><strong id="cpm-value">0</strong> ккал/хв</span>
+              <span
+                ><strong id="cpm-value">{{ formIntensity }}</strong>
+                ккал/хв</span
+              >
             </p>
 
             <button class="submit-button" type="submit">
@@ -80,12 +92,26 @@
         <section>
           <div class="section-header">
             <h2>Історія тренувань</h2>
-            <button id="refresh-button" class="refresh-button" type="button">
-              Оновити
+            <button
+              id="refresh-button"
+              class="refresh-button"
+              type="button"
+              @click="loadData"
+              :disabled="isLoading"
+            >
+              {{ isLoading ? 'Завантаження...' : 'Оновити' }}
             </button>
           </div>
 
-          <p id="status-message" class="status-message" aria-live="polite"></p>
+          <p
+            v-if="statusMessage"
+            id="status-message"
+            class="status-message"
+            :class="{ error: isError, loading: isLoading }"
+            aria-live="polite"
+          >
+            {{ statusMessage }}
+          </p>
 
           <div id="workouts-list" class="cards">
             <workout-row
@@ -97,69 +123,6 @@
               :calories="workout.calories"
               @delete-workout="removeWorkout"
             ></workout-row>
-
-            <!-- <article class="card">
-              <span class="workout-badge" aria-hidden="true">🎾</span>
-
-              <div class="card-content">
-                <h3>
-                  <span>10.09.2026</span> -
-                  <span>Командний спорт</span>
-                </h3>
-
-                <p>
-                  <span class="label">Назва:</span>
-                  <span>Теніс</span>
-                </p>
-
-                <p>
-                  <span class="label">Тривалість:</span>
-                  <span>40 хв</span>
-                </p>
-              </div>
-            </article>
-
-            <article class="card">
-              <span class="workout-badge" aria-hidden="true">💓</span>
-
-              <div class="card-content">
-                <h3>
-                  <span>10.09.2026</span> -
-                  <span>Кардіо</span>
-                </h3>
-
-                <p>
-                  <span class="label">Назва:</span>
-                  <span>Біг</span>
-                </p>
-
-                <p>
-                  <span class="label">Тривалість:</span>
-                  <span>5 хв</span>
-                </p>
-              </div>
-            </article>
-
-            <article class="card">
-              <span class="workout-badge" aria-hidden="true">🏋️‍♂️</span>
-
-              <div class="card-content">
-                <h3>
-                  <span>11.09.2026</span> -
-                  <span>Силове</span>
-                </h3>
-
-                <p>
-                  <span class="label">Назва:</span>
-                  <span>Штанга</span>
-                </p>
-
-                <p>
-                  <span class="label">Тривалість:</span>
-                  <span>30 хв</span>
-                </p>
-              </div>
-            </article> -->
           </div>
         </section>
       </main>
@@ -168,39 +131,52 @@
         <h2 id="statistics-heading">Статистика</h2>
         <p class="statistics-item">
           <span class="statistics-label">Кількість тренувань:</span>
-          <span class="statistics-value" id="count-trainings">3</span>
+          <span class="statistics-value" id="count-trainings"
+            >{{ totalTrainings }}</span
+          >
         </p>
 
         <p class="statistics-item">
           <span class="statistics-label">Загальний час:</span>
-          <span class="statistics-value" id="total-time">75 хв</span>
+          <span class="statistics-value" id="total-time"
+            >{{ totalMinutes }} хв</span
+          >
         </p>
 
         <p class="statistics-item">
           <span class="statistics-label">Середній час тренування:</span>
-          <span class="statistics-value" id="average-time">25 хв</span>
+          <span class="statistics-value" id="average-time"
+            >{{ averageMinutes }} хв</span
+          >
         </p>
 
         <p class="statistics-item">
           <span class="statistics-label">Спалені калорії:</span>
-          <span class="statistics-value" id="total-calories">0 ккал</span>
+          <span class="statistics-value" id="total-calories"
+            >{{ totalCalories }} ккал</span
+          >
         </p>
 
         <div class="progress-bar-section">
           <div class="progress-bar-labels">
             <span>Ціль на тиждень:</span>
-            <strong id="weekly-goal-text">0 / 5</strong>
+            <strong id="weekly-goal-text">{{ totalTrainings }} / 5</strong>
           </div>
 
           <div
             id="progress-bar"
             class="progress-bar"
             role="progressbar"
-            aria-valuenow="60"
+            :aria-valuenow="weeklyProgressPercent"
             aria-valuemin="0"
             aria-valuemax="100"
           >
-            <div class="progress-fill" id="progress-bar-fill"></div>
+            <div
+              class="progress-fill"
+              id="progress-bar-fill"
+              :style="{ width: weeklyProgressPercent + '%' }"
+              :class="{ completed: totalTrainings >= 5 }"
+            ></div>
           </div>
         </div>
       </aside>

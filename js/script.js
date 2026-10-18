@@ -1,14 +1,3 @@
-// Очищення статичних карток article
-// const allCards = document.querySelectorAll(".card");
-// allCards.forEach((x) => x.remove());
-
-// Закоментовано, оскільки тепер дані переведені у реактивний у Vue
-// const workouts = [
-//   { type: "Командний спорт", minutes: 40, calories: 600 },
-//   { type: "Кардіо", minutes: 15, calories: 100 },
-//   { type: "Силове", minutes: 30, calories: 800 },
-// ];
-
 // Компонент даних
 const WorkoutRow = {
   props: ["id", "type", "minutes", "calories"],
@@ -19,10 +8,15 @@ const WorkoutRow = {
       if (!this.minutes || this.minutes === 0) return 0;
       return (this.calories / this.minutes).toFixed(1);
     },
+
+    durationClass() {
+      const shortTrainingMax = 30;
+      return this.minutes <= shortTrainingMax ? "short" : "long";
+    },
   },
 
   template: `
-    <article class="card">
+    <article class="card" :class="durationClass">
       <div class="card-header">
         <h3>{{ type }}</h3>
         <button 
@@ -37,6 +31,8 @@ const WorkoutRow = {
     </article>
   `,
 };
+
+const URL = "https://jsonplaceholder.typicode.com/todos?userId=4";
 
 /*
  * Обраний фреймворк: Vue 3 (CDN, декларативний підхід).
@@ -57,249 +53,112 @@ Vue.createApp({
         { id: 2, type: "Кардіо", minutes: 15, calories: 100 },
         { id: 3, type: "Силове", minutes: 30, calories: 800 },
       ],
+
+      form: {
+        type: "",
+        minutes: null,
+        calories: null,
+      },
+
+      isLoading: false,
+      statusMessage: "",
+      isError: false,
     };
+  },
+
+  computed: {
+    formIntensity() {
+      if (
+        !this.form.minutes ||
+        this.form.minutes <= 0 ||
+        !this.form.calories ||
+        this.form.calories <= 0
+      ) {
+        return 0;
+      }
+
+      return (this.form.calories / this.form.minutes).toFixed(1);
+    },
+
+    totalTrainings() {
+      return this.workouts.length;
+    },
+
+    totalMinutes() {
+      return this.workouts.reduce((sum, w) => sum + Number(w.minutes || 0), 0);
+    },
+
+    averageMinutes() {
+      if (this.totalTrainings === 0) return 0;
+
+      return Math.round(this.totalMinutes / this.totalTrainings);
+    },
+
+    totalCalories() {
+      return this.workouts.reduce((sum, w) => sum + Number(w.calories || 0), 0);
+    },
+
+    weeklyProgressPercent() {
+      const targetGoal = 5;
+      return Math.min(
+        Math.round((this.totalTrainings / targetGoal) * 100),
+        100,
+      );
+    },
   },
 
   methods: {
     removeWorkout(id) {
       this.workouts = this.workouts.filter((w) => w.id !== id);
     },
+
+    addWorkout() {
+      if (!this.form.type || !this.form.minutes || !this.form.calories) {
+        return;
+      }
+
+      const maxId =
+        this.workouts.length > 0
+          ? Math.max(...this.workouts.map((w) => w.id))
+          : 0;
+
+      this.workouts.push({
+        id: maxId + 1,
+        type: this.form.type,
+        minutes: Number(this.form.minutes),
+        calories: Number(this.form.calories),
+      });
+
+      this.form.type = "";
+      this.form.minutes = null;
+      this.form.calories = null;
+    },
+
+    async loadData() {
+      this.isLoading = true;
+      this.statusMessage = "Завантаження тренувань...";
+      this.isError = false;
+
+      try {
+        const response = await fetch(URL);
+        if (!response.ok) {
+          throw new Error(`Код ${response.status}`);
+        }
+
+        const data = await response.json();
+        this.workouts = data.map((item) => ({
+          id: item.id,
+          type: item.title,
+          minutes: item.id % 2 === 0 ? 45 : 20,
+          calories: item.id % 2 === 0 ? 350 : 150,
+        }));
+        this.statusMessage = "";
+      } catch (error) {
+        this.isError = true;
+        this.statusMessage = "Журнал тренувань недоступний офлайн";
+      } finally {
+        this.isLoading = false;
+      }
+    },
   },
 }).mount("#app");
-
-const URL = "https://jsonplaceholder.typicode.com/todos?userId=4";
-
-const listContainer = document.querySelector("#workouts-list");
-const form = document.querySelector("#workout-form");
-const minutesInput = document.querySelector("#duration-input");
-const caloriesInput = document.querySelector("#calories-input");
-const cpmValue = document.querySelector("#cpm-value");
-
-// Закоментовано, оскільки тепер рендер замінено компонентом WorkoutRow у Vue
-// Функція для рендеру карток за масивом даних
-// function renderCards(workouts) {
-//   listContainer.innerHTML = "";
-//   for (const workout of workouts) {
-//     const card = document.createElement("article");
-//     const type = document.createElement("h3");
-//     const details = document.createElement("p");
-
-//     if ("title" in workout) {
-//       type.textContent = workout.title;
-//       details.textContent = workout.completed ? "✓ Виконано" : "⏳ У процесі";
-
-//       card.classList.add(workout.completed ? "completed" : "not-completed");
-//     } else {
-//       type.textContent = workout.type;
-//       details.textContent = `${workout.minutes} хв, ${workout.calories} ккал`;
-//       card.dataset.calories = workout.calories;
-//       card.classList.add(classifyTraining(workout));
-//     }
-//     card.classList.add("card");
-
-//     card.append(type);
-//     card.append(details);
-//     listContainer.append(card);
-//   }
-// }
-
-// Функція для оновлення числових полів статистики
-function updateStatistics(workouts) {
-  const countTrainings = document.querySelector("#count-trainings");
-  const totalTime = document.querySelector("#total-time");
-  const averageTime = document.querySelector("#average-time");
-  const totalCaloriesElement = document.querySelector("#total-calories");
-
-  countTrainings.textContent = workouts.length;
-  totalTime.textContent = `${sumMinutes(workouts)} хв`;
-  averageTime.textContent = `${workouts.length !== 0 ? Math.round(sumMinutes(workouts) / workouts.length) : 0} хв`;
-  totalCaloriesElement.textContent = `${sumCalories(workouts)} ккал`;
-
-  updateProgressBar(workouts);
-}
-
-// Функція для підрахунку загальної тривалості всіх тренувань у хв
-function sumMinutes(arr) {
-  let sum = 0;
-  for (const item of arr) {
-    sum += item.minutes;
-  }
-
-  return sum;
-}
-
-// Функція підрахунку усіх витрачених калорій впродовж тренувань
-function sumCalories(arr) {
-  let sum = 0;
-  for (let i = 0; i < arr.length; i++) {
-    sum += arr[i].calories;
-  }
-
-  return sum;
-}
-
-// Функція оновлення прогрес-бару
-function updateProgressBar(workouts) {
-  const weeklyGoalText = document.querySelector("#weekly-goal-text");
-  const progressBarFill = document.querySelector("#progress-bar-fill");
-  const progressBar = document.querySelector("#progress-bar");
-  const targetGoal = 5;
-  const currentCount = workouts.length;
-
-  const progressPercent = Math.min(
-    Math.round((currentCount / targetGoal) * 100),
-    100,
-  );
-
-  weeklyGoalText.textContent = `${currentCount} / ${targetGoal}`;
-  progressBarFill.style.width = `${progressPercent}%`;
-  progressBarFill.classList.toggle("completed", currentCount >= targetGoal);
-
-  progressBar.setAttribute("aria-valuenow", progressPercent);
-}
-
-// Функція, яка класифікує тренування за тривалістю
-function classifyTraining(workout) {
-  const shortTrainingMax = 30;
-
-  if (workout.minutes <= shortTrainingMax) {
-    return "short";
-  }
-
-  return "long";
-}
-
-// Функція розрахунку кількості спалених калорій за хвилину тренування
-const caloriesPerMinute = (w) => Math.round(w.calories / w.minutes);
-
-// Обробник події відправки даних форми
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const typeSelect = document.querySelector("#workout-type");
-  const durationInput = document.querySelector("#duration-input");
-  const caloriesInput = document.querySelector("#calories-input");
-
-  const type = typeSelect.value;
-  const duration = Number(durationInput.value);
-  const calories = Number(caloriesInput.value);
-
-  const newTraining = { type: type, minutes: duration, calories: calories };
-  workouts.push(newTraining);
-  renderCards(workouts);
-  updateStatistics(workouts);
-
-  form.reset();
-  cpmValue.textContent = "0";
-});
-
-// Функція-обробник події введення даних: оновлення розрахунку калорій/хвилину
-function updateCaloriesPerMinutePreview() {
-  const durationInput = document.querySelector("#duration-input");
-  const minutes = Number(durationInput.value);
-  const calories = Number(caloriesInput.value);
-
-  if (minutes > 0 && calories > 0) {
-    cpmValue.textContent = caloriesPerMinute({
-      type: undefined,
-      minutes: minutes,
-      calories: calories,
-    });
-  } else {
-    cpmValue.textContent = "0";
-  }
-}
-
-// Обробник події введення даних про спалені калорії
-caloriesInput.addEventListener("input", (event) => {
-  const caloriesMaxVal = 2000;
-  const caloriesMinVal = 1;
-  if (Number(caloriesInput.value) < caloriesMinVal) {
-    caloriesInput.setCustomValidity(
-      `Потрібно ввести дані, більші ${caloriesMinVal}`,
-    );
-  } else if (Number(caloriesInput.value) > caloriesMaxVal) {
-    caloriesInput.setCustomValidity(
-      `Завелике число! Треба ввести дані менші за ${caloriesMaxVal}`,
-    );
-  } else {
-    caloriesInput.setCustomValidity("");
-  }
-});
-
-// Обробник події введення даних про тривалість тренування
-minutesInput.addEventListener("input", (event) => {
-  const maxVal = 600;
-  const minVal = 1;
-
-  if (Number(minutesInput.value) > maxVal) {
-    minutesInput.setCustomValidity(
-      `Тривалість не може перевищувати ${maxVal} хв (10 годин)!`,
-    );
-  } else if (Number(minutesInput.value) < minVal) {
-    minutesInput.setCustomValidity("Тривалість має бути щонайменше 1 хв!");
-  } else {
-    minutesInput.setCustomValidity("");
-  }
-});
-
-minutesInput.addEventListener("input", updateCaloriesPerMinutePreview);
-caloriesInput.addEventListener("input", updateCaloriesPerMinutePreview);
-
-const refreshButton = document.querySelector("#refresh-button");
-const statusMessage = document.querySelector("#status-message");
-
-// Функція для відображення статусу завантаження для користувача
-function showLoading(isLoading) {
-  if (isLoading) {
-    statusMessage.textContent = "Завантаження тренувань...";
-    statusMessage.classList.remove("error");
-    statusMessage.classList.add("visible", "loading");
-  } else {
-    statusMessage.classList.remove("loading");
-    if (!statusMessage.classList.contains("error")) {
-      statusMessage.classList.remove("visible");
-      statusMessage.textContent = "";
-    }
-  }
-
-  refreshButton.disabled = isLoading;
-}
-
-// Функція для відображення помилки для користувача
-function showError(message) {
-  statusMessage.textContent = message;
-  statusMessage.classList.remove("loading");
-  statusMessage.classList.add("visible", "error");
-}
-
-// Функція завантаження даних із API
-async function loadData() {
-  showLoading(true);
-
-  try {
-    const response = await fetch(URL);
-    if (!response.ok) {
-      throw new Error(`Код ${response.status}`);
-    }
-
-    const data = await response.json();
-    renderCards(data);
-    console.log(data);
-  } catch (error) {
-    showError("Журнал тренувань недоступний офлайн");
-    console.error("Помилка завантаження даних:", error);
-  } finally {
-    showLoading(false);
-  }
-}
-
-// Додаємо обробник події на натискання кнопки
-refreshButton.addEventListener("click", () => {
-  loadData();
-});
-
-// Закоментовано, оскільки тепер рендер замінено компонентом WorkoutRow у Vue
-// renderCards(workouts);
-// updateStatistics(workouts);
-//loadData();
