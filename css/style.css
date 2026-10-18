@@ -274,14 +274,12 @@ form {
   border-left: 4px solid #ff6b00;
 }
 
-/* Шапка картки */
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
 
-/* Кнопка видалення */
 .card-delete-btn {
   background: none;
   border: none;
@@ -294,10 +292,9 @@ form {
 }
 
 .card-delete-btn:hover {
-  color: #ff5252; /* червоний акцент при наведенні */
+  color: #ff5252;
 }
 
-/* Похідне значення інтенсивності */
 .card-intensity {
   color: #ff6b00;
   margin-top: 0.25rem;

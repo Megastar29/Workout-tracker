@@ -2,11 +2,35 @@
 const allCards = document.querySelectorAll(".card");
 allCards.forEach((x) => x.remove());
 
-let workouts = [
+const defaultWorkouts = [
   { id: 1, type: "Командний спорт", duration: 40, date: "2026-10-12" },
   { id: 2, type: "Кардіо", duration: 15, date: "2026-10-14" },
   { id: 3, type: "Силове", duration: 30, date: "2026-10-17" },
 ];
+
+const storage_key = "workouts";
+
+function saveToLocalStorage(items) {
+  localStorage.setItem(storage_key, JSON.stringify(items));
+}
+
+function loadFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem(storage_key);
+    return raw ? JSON.parse(raw) : [];
+  } catch (error) {
+    console.error("Пошкоджені дані в localStorage:", error);
+    return [];
+  }
+}
+
+const savedData = loadFromLocalStorage();
+
+let workouts = savedData.length > 0 ? savedData : [...defaultWorkouts];
+
+if (savedData.length === 0) {
+  saveToLocalStorage(workouts);
+}
 
 const URL = "https://jsonplaceholder.typicode.com/todos?userId=4";
 
@@ -23,24 +47,63 @@ function renderCards(workouts) {
     const card = document.createElement("article");
     const type = document.createElement("h3");
     const details = document.createElement("p");
+    card.classList.add("card");
 
     if ("title" in workout) {
       type.textContent = workout.title;
       details.textContent = workout.completed ? "✓ Виконано" : "⏳ У процесі";
 
       card.classList.add(workout.completed ? "completed" : "not-completed");
+      card.append(type);
     } else {
       type.textContent = workout.type;
+
+      const cardHeader = document.createElement("div");
+      cardHeader.classList.add("card-header");
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.classList.add("card-delete-btn");
+      deleteBtn.textContent = "×";
+      deleteBtn.title = "Видалити";
+      deleteBtn.addEventListener("click", () => deleteWorkout(workout.id));
+
+      cardHeader.append(type, deleteBtn);
+      card.append(cardHeader);
+
       details.textContent = `${workout.duration} хв • ${workout.date}`;
-      card.dataset.calories = workout.calories;
       card.classList.add(classifyTraining(workout));
     }
-    card.classList.add("card");
 
-    card.append(type);
     card.append(details);
     listContainer.append(card);
   }
+}
+
+function deleteWorkout(id) {
+  workouts = workouts.filter((item) => item.id !== id);
+
+  saveToLocalStorage(workouts);
+
+  renderCards(workouts);
+  updateStatistics(workouts);
+}
+
+function isWithinCurrentWeek(dateString) {
+  if (!dateString) return false;
+
+  const workoutDate = new Date(dateString);
+  const now = new Date();
+  const sevenDaysInMonth = 7 * 24 * 60 * 60 * 1000;
+  const diff = now - workoutDate;
+
+  return diff >= 0 && diff <= sevenDaysInMonth;
+}
+
+function sumWeeklyDuration(arr) {
+  return arr
+    .filter((item) => isWithinCurrentWeek(item.date))
+    .reduce((sum, item) => sum + Number(item.duration || 0), 0);
 }
 
 // Функція для оновлення числових полів статистики
@@ -49,11 +112,13 @@ function updateStatistics(workouts) {
   const totalTime = document.querySelector("#total-time");
   const averageTime = document.querySelector("#average-time");
   //const totalCaloriesElement = document.querySelector("#total-calories");
+  const weeklyDurationElement = document.querySelector("#weekly-duration");
 
   countTrainings.textContent = workouts.length;
   totalTime.textContent = `${sumMinutes(workouts)} хв`;
   averageTime.textContent = `${workouts.length !== 0 ? Math.round(sumMinutes(workouts) / workouts.length) : 0} хв`;
   //totalCaloriesElement.textContent = `${sumCalories(workouts)} ккал`;
+  weeklyDurationElement.textContent = `${sumWeeklyDuration(workouts)} хв`;
 
   updateProgressBar(workouts);
 }
@@ -69,14 +134,14 @@ function sumMinutes(arr) {
 }
 
 // Функція підрахунку усіх витрачених калорій впродовж тренувань
-function sumCalories(arr) {
-  let sum = 0;
-  for (let i = 0; i < arr.length; i++) {
-    sum += arr[i].calories;
-  }
+// function sumCalories(arr) {
+//   let sum = 0;
+//   for (let i = 0; i < arr.length; i++) {
+//     sum += arr[i].calories;
+//   }
 
-  return sum;
-}
+//   return sum;
+// }
 
 // Функція оновлення прогрес-бару
 function updateProgressBar(workouts) {
@@ -110,7 +175,7 @@ function classifyTraining(workout) {
 }
 
 // Функція розрахунку кількості спалених калорій за хвилину тренування
-const caloriesPerMinute = (w) => Math.round(w.calories / w.duration);
+// const caloriesPerMinute = (w) => Math.round(w.calories / w.duration);
 
 // Обробник події відправки даних форми
 form.addEventListener("submit", (event) => {
@@ -135,7 +200,11 @@ form.addEventListener("submit", (event) => {
     duration: duration,
     date: date,
   };
+
   workouts.push(newTraining);
+
+  saveToLocalStorage(workouts);
+
   renderCards(workouts);
   updateStatistics(workouts);
 
@@ -144,21 +213,21 @@ form.addEventListener("submit", (event) => {
 });
 
 //Функція-обробник події введення даних: оновлення розрахунку калорій/хвилину
-function updateCaloriesPerMinutePreview() {
-  const durationInput = document.querySelector("#duration-input");
-  const minutes = Number(durationInput.value);
-  const calories = Number(caloriesInput.value);
+// function updateCaloriesPerMinutePreview() {
+//   const durationInput = document.querySelector("#duration-input");
+//   const minutes = Number(durationInput.value);
+//   const calories = Number(caloriesInput.value);
 
-  if (minutes > 0 && calories > 0) {
-    cpmValue.textContent = caloriesPerMinute({
-      type: undefined,
-      duration: minutes,
-      calories: calories,
-    });
-  } else {
-    cpmValue.textContent = "0";
-  }
-}
+//   if (minutes > 0 && calories > 0) {
+//     cpmValue.textContent = caloriesPerMinute({
+//       type: undefined,
+//       duration: minutes,
+//       calories: calories,
+//     });
+//   } else {
+//     cpmValue.textContent = "0";
+//   }
+// }
 
 //Обробник події введення даних про спалені калорії
 // caloriesInput.addEventListener("input", (event) => {
@@ -248,22 +317,6 @@ async function loadData() {
 refreshButton.addEventListener("click", () => {
   loadData();
 });
-
-const storage_key = "workouts";
-
-function saveToLocalStorage(items) {
-  localStorage.setItem(storage_key, JSON.stringify(items));
-}
-
-function loadFromLocalStorage() {
-  try {
-    const raw = localStorage.getItem(storage_key);
-    return raw ? JSON.parse(raw) : [];
-  } catch (error) {
-    console.error("Пошкоджені дані в localStorage:", error);
-    return [];
-  }
-}
 
 renderCards(workouts);
 updateStatistics(workouts);
