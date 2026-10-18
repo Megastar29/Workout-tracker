@@ -3,68 +3,10 @@ const allCards = document.querySelectorAll(".card");
 allCards.forEach((x) => x.remove());
 
 let workouts = [
-  { id: 1, type: "Командний спорт", duration: 40, date: "2026-10-12"},
-  { id: 2, type: "Кардіо", duration: 15, date: "2026-10-14"},
-  { id: 3, type: "Силове", duration: 30, date: "2026-10-17"},
+  { id: 1, type: "Командний спорт", duration: 40, date: "2026-10-12" },
+  { id: 2, type: "Кардіо", duration: 15, date: "2026-10-14" },
+  { id: 3, type: "Силове", duration: 30, date: "2026-10-17" },
 ];
-
-// // Компонент даних
-// const WorkoutRow = {
-//   props: ["id", "type", "minutes", "calories"],
-//   emits: ["delete-workout"],
-
-//   computed: {
-//     caloriesPerMinute() {
-//       if (!this.minutes || this.minutes === 0) return 0;
-//       return (this.calories / this.minutes).toFixed(1);
-//     },
-//   },
-
-//   template: `
-//     <article class="card">
-//       <div class="card-header">
-//         <h3>{{ type }}</h3>
-//         <button 
-//           type="button" 
-//           class="card-delete-btn"
-//           @click="$emit('delete-workout', id)" 
-//           title="Видалити"
-//         >&times;</button>
-//       </div>
-//       <p>{{ minutes }} хв, {{ calories }} ккал</p>
-//       <p class="card-intensity">{{ caloriesPerMinute }} ккал/хв</p>
-//     </article>
-//   `,
-// };
-
-// /*
-//  * Обраний фреймворк: Vue 3 (CDN, декларативний підхід).
-//  * Причина вибору: швидка інтеграція без необхідності налаштування складних
-//  * збирачів (Vite/Webpack), зручна робота з реактивними даними та наявність
-//  * computed properties для автоматичного обчислення похідного значення (ккал/хв).
-//  */
-// // Робота із Vue - створення додатку
-// Vue.createApp({
-//   components: {
-//     WorkoutRow,
-//   },
-
-//   data() {
-//     return {
-//       workouts: [
-//         { id: 1, type: "Командний спорт", minutes: 40, calories: 600 },
-//         { id: 2, type: "Кардіо", minutes: 15, calories: 100 },
-//         { id: 3, type: "Силове", minutes: 30, calories: 800 },
-//       ],
-//     };
-//   },
-
-//   methods: {
-//     removeWorkout(id) {
-//       this.workouts = this.workouts.filter((w) => w.id !== id);
-//     },
-//   },
-// }).mount("#app");
 
 const URL = "https://jsonplaceholder.typicode.com/todos?userId=4";
 
@@ -106,12 +48,12 @@ function updateStatistics(workouts) {
   const countTrainings = document.querySelector("#count-trainings");
   const totalTime = document.querySelector("#total-time");
   const averageTime = document.querySelector("#average-time");
-  const totalCaloriesElement = document.querySelector("#total-calories");
+  //const totalCaloriesElement = document.querySelector("#total-calories");
 
   countTrainings.textContent = workouts.length;
   totalTime.textContent = `${sumMinutes(workouts)} хв`;
   averageTime.textContent = `${workouts.length !== 0 ? Math.round(sumMinutes(workouts) / workouts.length) : 0} хв`;
-  totalCaloriesElement.textContent = `${sumCalories(workouts)} ккал`;
+  //totalCaloriesElement.textContent = `${sumCalories(workouts)} ккал`;
 
   updateProgressBar(workouts);
 }
@@ -176,13 +118,23 @@ form.addEventListener("submit", (event) => {
 
   const typeSelect = document.querySelector("#workout-type");
   const durationInput = document.querySelector("#duration-input");
-  const caloriesInput = document.querySelector("#calories-input");
+  //const caloriesInput = document.querySelector("#calories-input");
+  const dateInput = document.querySelector("#workout-date");
 
   const type = typeSelect.value;
   const duration = Number(durationInput.value);
-  const calories = Number(caloriesInput.value);
+  //const calories = Number(caloriesInput.value);
+  const date = dateInput.value;
 
-  const newTraining = { type: type, duration: duration, calories: calories };
+  const maxId =
+    workouts.length > 0 ? Math.max(...workouts.map((w) => w.id)) : 0;
+
+  const newTraining = {
+    id: maxId + 1,
+    type: type,
+    duration: duration,
+    date: date,
+  };
   workouts.push(newTraining);
   renderCards(workouts);
   updateStatistics(workouts);
@@ -191,24 +143,24 @@ form.addEventListener("submit", (event) => {
   //cpmValue.textContent = "0";
 });
 
-// Функція-обробник події введення даних: оновлення розрахунку калорій/хвилину
-// function updateCaloriesPerMinutePreview() {
-//   const durationInput = document.querySelector("#duration-input");
-//   const minutes = Number(durationInput.value);
-//   const calories = Number(caloriesInput.value);
+//Функція-обробник події введення даних: оновлення розрахунку калорій/хвилину
+function updateCaloriesPerMinutePreview() {
+  const durationInput = document.querySelector("#duration-input");
+  const minutes = Number(durationInput.value);
+  const calories = Number(caloriesInput.value);
 
-//   if (minutes > 0 && calories > 0) {
-//     cpmValue.textContent = caloriesPerMinute({
-//       type: undefined,
-//       duration: minutes,
-//       calories: calories,
-//     });
-//   } else {
-//     cpmValue.textContent = "0";
-//   }
-// }
+  if (minutes > 0 && calories > 0) {
+    cpmValue.textContent = caloriesPerMinute({
+      type: undefined,
+      duration: minutes,
+      calories: calories,
+    });
+  } else {
+    cpmValue.textContent = "0";
+  }
+}
 
-// Обробник події введення даних про спалені калорії
+//Обробник події введення даних про спалені калорії
 // caloriesInput.addEventListener("input", (event) => {
 //   const caloriesMaxVal = 2000;
 //   const caloriesMinVal = 1;
@@ -296,6 +248,22 @@ async function loadData() {
 refreshButton.addEventListener("click", () => {
   loadData();
 });
+
+const storage_key = "workouts";
+
+function saveToLocalStorage(items) {
+  localStorage.setItem(storage_key, JSON.stringify(items));
+}
+
+function loadFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem(storage_key);
+    return raw ? JSON.parse(raw) : [];
+  } catch (error) {
+    console.error("Пошкоджені дані в localStorage:", error);
+    return [];
+  }
+}
 
 renderCards(workouts);
 updateStatistics(workouts);

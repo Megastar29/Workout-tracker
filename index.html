@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Трекер тренувань</title>
     <link rel="stylesheet" href="css/style.css" />
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
     <script src="js/script.js" defer></script>
   </head>
   <body>
@@ -87,7 +87,7 @@
           <p id="status-message" class="status-message" aria-live="polite"></p>
 
           <div id="workouts-list" class="cards">
-            <workout-row
+            <!-- <workout-row
               v-for="workout in workouts"
               :id="workout.id"
               :key="workout.id"
@@ -95,7 +95,7 @@
               :minutes="workout.minutes"
               :calories="workout.calories"
               @delete-workout="removeWorkout"
-            ></workout-row>
+            ></workout-row> -->
 
             <!-- <article class="card">
               <span class="workout-badge" aria-hidden="true">🎾</span>
@@ -180,9 +180,13 @@
           <span class="statistics-value" id="average-time">25 хв</span>
         </p>
 
-        <p class="statistics-item">
+        <!-- <p class="statistics-item">
           <span class="statistics-label">Спалені калорії:</span>
           <span class="statistics-value" id="total-calories">0 ккал</span>
+        </p> -->
+        <p class="statistics-item">
+          <span class="statistics-label">Час за поточний тиждень:</span>
+          <span class="statistics-value" id="weekly-duration">0 хв</span>
         </p>
 
         <div class="progress-bar-section">
