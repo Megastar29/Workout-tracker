@@ -10,10 +10,12 @@ const defaultWorkouts = [
 
 const storage_key = "workouts";
 
+// Функція завантаження даних у localStorage
 function saveToLocalStorage(items) {
   localStorage.setItem(storage_key, JSON.stringify(items));
 }
 
+// Функція для завантаження даних із localStorage
 function loadFromLocalStorage() {
   try {
     const raw = localStorage.getItem(storage_key);
@@ -24,21 +26,100 @@ function loadFromLocalStorage() {
   }
 }
 
-const savedData = loadFromLocalStorage();
+const dbName = "WorkoutsDB";
+const dbVersion = 1;
+const objectStoreName = "workouts";
 
-let workouts = savedData.length > 0 ? savedData : [...defaultWorkouts];
+// Функція для відкриття БД
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(dbName, dbVersion);
 
-if (savedData.length === 0) {
-  saveToLocalStorage(workouts);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(objectStoreName)) {
+        db.createObjectStore(objectStoreName, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
 }
 
-const URL = "https://jsonplaceholder.typicode.com/todos?userId=4";
+// Функція для додавання даних у БД
+async function addItem(workout) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(objectStoreName, "readwrite");
+    const objectStore = tx.objectStore(objectStoreName);
+
+    objectStore.put(workout);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// Функція для зчитування всіх даних із БД
+async function getAllItems() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(objectStoreName, "readonly");
+    const store = tx.objectStore(objectStoreName);
+    const request = store.getAll();
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Функція видалення тренування із БД
+async function deleteItem(id) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(objectStoreName, "readwrite");
+    const store = tx.objectStore(objectStoreName);
+
+    store.delete(id);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+const migrationFlagKey = "workouts_migrated";
+
+// Функція для здійснення міграції даних
+async function migrateFromLocalStorage() {
+  if (localStorage.getItem(migrationFlagKey) === "true") {
+    return;
+  }
+
+  try {
+    const existingInDB = await getAllItems();
+    const localData = loadFromLocalStorage();
+
+    if (existingInDB.length === 0 && localData.length > 0) {
+      for (const workout of localData) {
+        await addItem(workout);
+      }
+      console.log(
+        `Міграція успішна: перенесено ${localData.length} записів у IndexedDB.`,
+      );
+    }
+
+    localStorage.setItem(migrationFlagKey, "true");
+  } catch (error) {
+    console.error("Помилка під час міграції даних:", error);
+  }
+}
 
 const listContainer = document.querySelector("#workouts-list");
 const form = document.querySelector("#workout-form");
 const minutesInput = document.querySelector("#duration-input");
-//const caloriesInput = document.querySelector("#calories-input");
-//const cpmValue = document.querySelector("#cpm-value");
 
 //Функція для рендеру карток за масивом даних
 function renderCards(workouts) {
@@ -49,55 +130,60 @@ function renderCards(workouts) {
     const details = document.createElement("p");
     card.classList.add("card");
 
-    if ("title" in workout) {
-      type.textContent = workout.title;
-      details.textContent = workout.completed ? "✓ Виконано" : "⏳ У процесі";
+    type.textContent = workout.type;
 
-      card.classList.add(workout.completed ? "completed" : "not-completed");
-      card.append(type);
-    } else {
-      type.textContent = workout.type;
+    const cardHeader = document.createElement("div");
+    cardHeader.classList.add("card-header");
 
-      const cardHeader = document.createElement("div");
-      cardHeader.classList.add("card-header");
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.classList.add("card-delete-btn");
+    deleteBtn.textContent = "×";
+    deleteBtn.title = "Видалити";
+    deleteBtn.addEventListener("click", () => deleteWorkout(workout.id));
 
-      const deleteBtn = document.createElement("button");
-      deleteBtn.type = "button";
-      deleteBtn.classList.add("card-delete-btn");
-      deleteBtn.textContent = "×";
-      deleteBtn.title = "Видалити";
-      deleteBtn.addEventListener("click", () => deleteWorkout(workout.id));
+    cardHeader.append(type, deleteBtn);
+    card.append(cardHeader);
 
-      cardHeader.append(type, deleteBtn);
-      card.append(cardHeader);
-
-      details.textContent = `${workout.duration} хв • ${workout.date}`;
-      card.classList.add(classifyTraining(workout));
-    }
+    details.textContent = `${workout.duration} хв • ${workout.date}`;
+    card.classList.add(classifyTraining(workout));
 
     card.append(details);
     listContainer.append(card);
   }
 }
 
-function deleteWorkout(id) {
-  workouts = workouts.filter((item) => item.id !== id);
-
-  saveToLocalStorage(workouts);
-
-  renderCards(workouts);
-  updateStatistics(workouts);
+// Функція видалення тренування
+async function deleteWorkout(id) {
+  try {
+    await deleteItem(id);
+    await refreshUI();
+  } catch (error) {
+    console.error("Помилка видалення запису:", error);
+    alert("Не вдалося видалити тренування зі сховища.");
+  }
 }
 
+// Функція перевірки чи є дана дата у межах поточного тижня
 function isWithinCurrentWeek(dateString) {
   if (!dateString) return false;
 
   const workoutDate = new Date(dateString);
-  const now = new Date();
-  const sevenDaysInMonth = 7 * 24 * 60 * 60 * 1000;
-  const diff = now - workoutDate;
+  workoutDate.setHours(0, 0, 0, 0);
 
-  return diff >= 0 && diff <= sevenDaysInMonth;
+  const now = new Date();
+  const currentDay = now.getDay();
+  const daysSinceMonday = currentDay === 0 ? 6 : currentDay - 1;
+
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - daysSinceMonday);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  return workoutDate >= startOfWeek && workoutDate <= endOfWeek;
 }
 
 function sumWeeklyDuration(arr) {
@@ -111,13 +197,11 @@ function updateStatistics(workouts) {
   const countTrainings = document.querySelector("#count-trainings");
   const totalTime = document.querySelector("#total-time");
   const averageTime = document.querySelector("#average-time");
-  //const totalCaloriesElement = document.querySelector("#total-calories");
   const weeklyDurationElement = document.querySelector("#weekly-duration");
 
   countTrainings.textContent = workouts.length;
   totalTime.textContent = `${sumMinutes(workouts)} хв`;
   averageTime.textContent = `${workouts.length !== 0 ? Math.round(sumMinutes(workouts) / workouts.length) : 0} хв`;
-  //totalCaloriesElement.textContent = `${sumCalories(workouts)} ккал`;
   weeklyDurationElement.textContent = `${sumWeeklyDuration(workouts)} хв`;
 
   updateProgressBar(workouts);
@@ -133,16 +217,6 @@ function sumMinutes(arr) {
   return sum;
 }
 
-// Функція підрахунку усіх витрачених калорій впродовж тренувань
-// function sumCalories(arr) {
-//   let sum = 0;
-//   for (let i = 0; i < arr.length; i++) {
-//     sum += arr[i].calories;
-//   }
-
-//   return sum;
-// }
-
 // Функція оновлення прогрес-бару
 function updateProgressBar(workouts) {
   const weeklyGoalText = document.querySelector("#weekly-goal-text");
@@ -150,7 +224,9 @@ function updateProgressBar(workouts) {
   const progressBar = document.querySelector("#progress-bar");
   const targetGoal = 5;
 
-  const weeklyWorkouts = workouts.filter((item) => isWithinCurrentWeek(item.date));
+  const weeklyWorkouts = workouts.filter((item) =>
+    isWithinCurrentWeek(item.date),
+  );
   const currentCount = weeklyWorkouts.length;
 
   const progressPercent = Math.min(
@@ -176,77 +252,33 @@ function classifyTraining(workout) {
   return "long";
 }
 
-// Функція розрахунку кількості спалених калорій за хвилину тренування
-// const caloriesPerMinute = (w) => Math.round(w.calories / w.duration);
-
 // Обробник події відправки даних форми
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const typeSelect = document.querySelector("#workout-type");
   const durationInput = document.querySelector("#duration-input");
-  //const caloriesInput = document.querySelector("#calories-input");
   const dateInput = document.querySelector("#workout-date");
 
   const type = typeSelect.value;
   const duration = Number(durationInput.value);
-  //const calories = Number(caloriesInput.value);
   const date = dateInput.value;
 
-  const maxId =
-    workouts.length > 0 ? Math.max(...workouts.map((w) => w.id)) : 0;
-
   const newTraining = {
-    id: maxId + 1,
     type: type,
     duration: duration,
     date: date,
   };
 
-  workouts.push(newTraining);
-
-  saveToLocalStorage(workouts);
-
-  renderCards(workouts);
-  updateStatistics(workouts);
-
-  form.reset();
-  //cpmValue.textContent = "0";
+  try {
+    await addItem(newTraining);
+    await refreshUI();
+    form.reset();
+  } catch (error) {
+    console.error("Помилка збереження запису:", error);
+    alert("Не вдалося зберегти тренування. Спробуйте ще раз.");
+  }
 });
-
-//Функція-обробник події введення даних: оновлення розрахунку калорій/хвилину
-// function updateCaloriesPerMinutePreview() {
-//   const durationInput = document.querySelector("#duration-input");
-//   const minutes = Number(durationInput.value);
-//   const calories = Number(caloriesInput.value);
-
-//   if (minutes > 0 && calories > 0) {
-//     cpmValue.textContent = caloriesPerMinute({
-//       type: undefined,
-//       duration: minutes,
-//       calories: calories,
-//     });
-//   } else {
-//     cpmValue.textContent = "0";
-//   }
-// }
-
-//Обробник події введення даних про спалені калорії
-// caloriesInput.addEventListener("input", (event) => {
-//   const caloriesMaxVal = 2000;
-//   const caloriesMinVal = 1;
-//   if (Number(caloriesInput.value) < caloriesMinVal) {
-//     caloriesInput.setCustomValidity(
-//       `Потрібно ввести дані, більші ${caloriesMinVal}`,
-//     );
-//   } else if (Number(caloriesInput.value) > caloriesMaxVal) {
-//     caloriesInput.setCustomValidity(
-//       `Завелике число! Треба ввести дані менші за ${caloriesMaxVal}`,
-//     );
-//   } else {
-//     caloriesInput.setCustomValidity("");
-//   }
-// });
 
 // Обробник події введення даних про тривалість тренування
 minutesInput.addEventListener("input", (event) => {
@@ -264,62 +296,46 @@ minutesInput.addEventListener("input", (event) => {
   }
 });
 
-//minutesInput.addEventListener("input", updateCaloriesPerMinutePreview);
-//caloriesInput.addEventListener("input", updateCaloriesPerMinutePreview);
+// Функція для відображення помилок БД
+function showDatabaseError(message) {
+  const statusMessage = document.querySelector("#status-message");
 
-// const refreshButton = document.querySelector("#refresh-button");
-// const statusMessage = document.querySelector("#status-message");
+  statusMessage.textContent = message;
+  statusMessage.classList.remove("loading");
+  statusMessage.classList.add("visible", "error");
+}
 
-// Функція для відображення статусу завантаження для користувача
-// function showLoading(isLoading) {
-//   if (isLoading) {
-//     statusMessage.textContent = "Завантаження тренувань...";
-//     statusMessage.classList.remove("error");
-//     statusMessage.classList.add("visible", "loading");
-//   } else {
-//     statusMessage.classList.remove("loading");
-//     if (!statusMessage.classList.contains("error")) {
-//       statusMessage.classList.remove("visible");
-//       statusMessage.textContent = "";
-//     }
-//   }
+let workouts = [];
 
-//   refreshButton.disabled = isLoading;
-// }
+// Функція для оновлення карток та статистики
+async function refreshUI() {
+  workouts = await getAllItems();
+  renderCards(workouts);
+  updateStatistics(workouts);
+}
 
-// Функція для відображення помилки для користувача
-// function showError(message) {
-//   statusMessage.textContent = message;
-//   statusMessage.classList.remove("loading");
-//   statusMessage.classList.add("visible", "error");
-// }
+// Функція початкової ініціалізації сайту
+async function init() {
+  try {
+    await openDB();
+  } catch (error) {
+    console.error("Помилка відкриття IndexedDB:", error);
+    showDatabaseError(
+      "Сховище IndexedDB недоступне. Тренування не можуть бути завантажені."
+    );
+    return;
+  }
 
-// Функція завантаження даних із API
-// async function loadData() {
-//   showLoading(true);
+  await migrateFromLocalStorage();
 
-//   try {
-//     const response = await fetch(URL);
-//     if (!response.ok) {
-//       throw new Error(`Код ${response.status}`);
-//     }
+  let items = await getAllItems();
+  if (items.length === 0) {
+    for (const item of defaultWorkouts) {
+      await addItem(item);
+    }
+  }
 
-//     const data = await response.json();
-//     renderCards(data);
-//     console.log(data);
-//   } catch (error) {
-//     showError("Журнал тренувань недоступний офлайн");
-//     console.error("Помилка завантаження даних:", error);
-//   } finally {
-//     showLoading(false);
-//   }
-// }
+  await refreshUI();
+}
 
-// Додаємо обробник події на натискання кнопки
-// refreshButton.addEventListener("click", () => {
-//   loadData();
-// });
-
-renderCards(workouts);
-updateStatistics(workouts);
-//loadData();
+init();
