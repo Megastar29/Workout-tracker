@@ -312,6 +312,7 @@ async function refreshUI() {
   workouts = await getAllItems();
   renderCards(workouts);
   updateStatistics(workouts);
+  animateWeeklyChart(workouts);
 }
 
 // Функція початкової ініціалізації сайту
@@ -321,7 +322,7 @@ async function init() {
   } catch (error) {
     console.error("Помилка відкриття IndexedDB:", error);
     showDatabaseError(
-      "Сховище IndexedDB недоступне. Тренування не можуть бути завантажені."
+      "Сховище IndexedDB недоступне. Тренування не можуть бути завантажені.",
     );
     return;
   }
@@ -336,6 +337,109 @@ async function init() {
   }
 
   await refreshUI();
+}
+
+let chartAnimationId = null;
+
+// Функція для анімованого зображення графіка
+function animateWeeklyChart(workouts) {
+  const chartCanvas = document.querySelector("#weekly-chart");
+  if (!chartCanvas) return;
+  const chartCtx = chartCanvas.getContext("2d");
+
+  if (chartAnimationId) {
+    cancelAnimationFrame(chartAnimationId);
+  }
+
+  const dayLabels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
+  const dailyDurations = [0, 0, 0, 0, 0, 0, 0];
+
+  const currentWeekWorkouts = workouts.filter((item) =>
+    isWithinCurrentWeek(item.date),
+  );
+
+  for (const item of currentWeekWorkouts) {
+    const workoutDate = new Date(item.date);
+    const dayIndex = (workoutDate.getDay() + 6) % 7;
+    dailyDurations[dayIndex] += Number(item.duration) || 0;
+  }
+
+  const maxVal = Math.max(...dailyDurations, 60);
+  const paddingBottom = 26;
+  const paddingTop = 22;
+  const chartHeight = chartCanvas.height - paddingBottom - paddingTop;
+  const barCount = dailyDurations.length;
+  const barWidth = 22;
+  const gap = (chartCanvas.width - barWidth * barCount) / (barCount + 1);
+
+  let progress = 0;
+
+  function renderFrame() {
+    progress += 0.05;
+    if (progress > 1) {
+      progress = 1;
+    }
+
+    chartCtx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+
+    dailyDurations.forEach((duration, i) => {
+      const x = gap + i * (barWidth + gap);
+
+      const targetHeight = duration > 0 ? (duration / maxVal) * chartHeight : 2;
+      const currentHeight = targetHeight * progress;
+      const y = chartCanvas.height - paddingBottom - currentHeight;
+
+      chartCtx.fillStyle = duration > 0 ? "#ff6b00" : "#2a2a2a";
+      chartCtx.fillRect(x, y, barWidth, currentHeight);
+
+      chartCtx.fillStyle = "#a0a0a0";
+      chartCtx.font = "12px Roboto, sans-serif";
+      chartCtx.textAlign = "center";
+      chartCtx.fillText(dayLabels[i], x + barWidth / 2, chartCanvas.height - 8);
+
+      if (duration > 0 && progress >= 0.8) {
+        chartCtx.fillStyle = "#ffffff";
+        chartCtx.font = "10px Roboto, sans-serif";
+        chartCtx.fillText(`${duration}`, x + barWidth / 2, y - 6);
+      }
+    });
+
+    if (progress < 1) {
+      chartAnimationId = requestAnimationFrame(renderFrame);
+    } else {
+      chartAnimationId = null;
+    }
+  }
+
+  chartAnimationId = requestAnimationFrame(renderFrame);
+}
+
+// Обробник події для зупинки анімації при перемиканні вкладок браузера
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && chartAnimationId) {
+    cancelAnimationFrame(chartAnimationId);
+    chartAnimationId = null;
+  }
+});
+
+const weeklyCanvas = document.querySelector("#weekly-chart");
+
+// Зупинка анімації, якщо canvas не в зоні видимості
+if (weeklyCanvas && "IntersectionObserver" in window) {
+  const chartObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        // Якщо полотно вийшло за межі viewport під час активного циклу — скасовуємо кадри
+        if (!entry.isIntersecting && chartAnimationId) {
+          cancelAnimationFrame(chartAnimationId);
+          chartAnimationId = null;
+        }
+      });
+    },
+    { threshold: 0.1 },
+  );
+
+  chartObserver.observe(weeklyCanvas);
 }
 
 init();
