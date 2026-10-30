@@ -191,6 +191,7 @@ function isWithinCurrentWeek(dateString) {
   return workoutDate >= startOfWeek && workoutDate <= endOfWeek;
 }
 
+// Функція для підрахунку тривалості тренувань за поточний тиждень
 function sumWeeklyDuration(arr) {
   return arr
     .filter((item) => isWithinCurrentWeek(item.date))
@@ -349,6 +350,7 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
+// Функція для ініціалізації обробників подій форми
 function initForm() {
   const formElement = document.querySelector("#workout-form");
   const minutesInput = document.querySelector("#duration-input");
@@ -394,6 +396,7 @@ function initForm() {
   });
 }
 
+// Функція для створення форми
 function createForm() {
   const form = document.createElement("form");
   form.id = "workout-form";
@@ -483,6 +486,7 @@ function createForm() {
 
 const appContainer = document.querySelector("#app");
 
+// Функція для рендеру "сторінки" Журнал
 async function renderJournalView() {
   appContainer.innerHTML = "";
 
@@ -518,6 +522,7 @@ async function renderJournalView() {
   initForm();
 }
 
+// Функція для рендеру "сторінки" Деталі тренування
 async function renderWorkoutDetailsView(params) {
   appContainer.innerHTML = "";
 
@@ -597,6 +602,7 @@ async function renderWorkoutDetailsView(params) {
   appContainer.append(detailsSection);
 }
 
+// Функція для рендеру "сторінки" Статистика
 async function renderStatsView() {
   appContainer.innerHTML = "";
 
@@ -702,12 +708,14 @@ async function renderStatsView() {
   }
 }
 
+// Таблиця маршрутів: шлях -> функція рендеру відповідної частини
 const routes = [
   { path: "/", view: renderJournalView },
   { path: "/workouts/:id", view: renderWorkoutDetailsView },
   { path: "/stats", view: renderStatsView },
 ];
 
+// Функція для розпізнавання шляху та співставлення його із таблицею маршрутів
 function matchRoute(path) {
   const pathParts = path.split("/").filter(Boolean);
   for (const route of routes) {
@@ -734,6 +742,7 @@ function matchRoute(path) {
   return null;
 }
 
+// Функція для зміни хешу сайту
 function navigate(url) {
   if (!url) {
     return;
@@ -742,6 +751,7 @@ function navigate(url) {
   window.location.hash = url.startsWith("#") ? url : `#${url}`;
 }
 
+// Обробник подій click на сайті
 document.addEventListener("click", (event) => {
   const link = event.target.closest("[data-link]");
 
@@ -752,6 +762,7 @@ document.addEventListener("click", (event) => {
   }
 });
 
+// Функція-маршрутизатор для виклику відповідних функцій рендеру
 async function router() {
   let path = window.location.hash.slice(1);
 
@@ -771,6 +782,7 @@ async function router() {
   updateActiveNavLink(path);
 }
 
+// Функція для рендеру "сторінки" для відображення повідомлення про неправильний URL
 function renderNotFoundView() {
   appContainer.innerHTML = "";
 
@@ -798,6 +810,7 @@ function renderNotFoundView() {
   appContainer.append(section);
 }
 
+// Функція для фарбування обраного посилання у nav
 function updateActiveNavLink(currentPath) {
   const navLinks = document.querySelectorAll(".main-nav .nav-link");
 
@@ -808,8 +821,10 @@ function updateActiveNavLink(currentPath) {
   });
 }
 
+// Обробник події зміни хешу сайту
 window.addEventListener("hashchange", router);
 
+// Функція ініціалізації сайту
 async function init() {
   try {
     await openDB();
