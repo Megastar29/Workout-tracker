@@ -1,7 +1,3 @@
-//Очищення статичних карток article
-const allCards = document.querySelectorAll(".card");
-allCards.forEach((x) => x.remove());
-
 const defaultWorkouts = [
   { id: 1, type: "Командний спорт", duration: 40, date: "2026-10-12" },
   { id: 2, type: "Кардіо", duration: 15, date: "2026-10-14" },
@@ -117,9 +113,6 @@ async function migrateFromLocalStorage() {
   }
 }
 
-const form = document.querySelector("#workout-form");
-const minutesInput = document.querySelector("#duration-input");
-
 //Функція для рендеру карток за масивом даних
 function renderCards(workouts) {
   const listContainer = document.querySelector("#workouts-list");
@@ -168,7 +161,8 @@ function renderCards(workouts) {
 async function deleteWorkout(id) {
   try {
     await deleteItem(id);
-    await refreshUI();
+    const updatedWorkouts = await getAllItems();
+    renderCards(updatedWorkouts);
   } catch (error) {
     console.error("Помилка видалення запису:", error);
     alert("Не вдалося видалити тренування зі сховища.");
@@ -263,50 +257,6 @@ function classifyTraining(workout) {
   return "long";
 }
 
-// Обробник події відправки даних форми
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const typeSelect = document.querySelector("#workout-type");
-  const durationInput = document.querySelector("#duration-input");
-  const dateInput = document.querySelector("#workout-date");
-
-  const type = typeSelect.value;
-  const duration = Number(durationInput.value);
-  const date = dateInput.value;
-
-  const newTraining = {
-    type: type,
-    duration: duration,
-    date: date,
-  };
-
-  try {
-    await addItem(newTraining);
-    await refreshUI();
-    form.reset();
-  } catch (error) {
-    console.error("Помилка збереження запису:", error);
-    alert("Не вдалося зберегти тренування. Спробуйте ще раз.");
-  }
-});
-
-// Обробник події введення даних про тривалість тренування
-minutesInput.addEventListener("input", (event) => {
-  const maxVal = 600;
-  const minVal = 1;
-
-  if (Number(minutesInput.value) > maxVal) {
-    minutesInput.setCustomValidity(
-      `Тривалість не може перевищувати ${maxVal} хв (10 годин)!`,
-    );
-  } else if (Number(minutesInput.value) < minVal) {
-    minutesInput.setCustomValidity("Тривалість має бути щонайменше 1 хв!");
-  } else {
-    minutesInput.setCustomValidity("");
-  }
-});
-
 // Функція для відображення помилок БД
 function showDatabaseError(message) {
   const statusMessage = document.querySelector("#status-message");
@@ -314,40 +264,6 @@ function showDatabaseError(message) {
   statusMessage.textContent = message;
   statusMessage.classList.remove("loading");
   statusMessage.classList.add("visible", "error");
-}
-
-let workouts = [];
-
-// Функція для оновлення карток та статистики
-async function refreshUI() {
-  workouts = await getAllItems();
-  renderCards(workouts);
-  updateStatistics(workouts);
-  animateWeeklyChart(workouts);
-}
-
-// Функція початкової ініціалізації сайту
-async function init() {
-  try {
-    await openDB();
-  } catch (error) {
-    console.error("Помилка відкриття IndexedDB:", error);
-    showDatabaseError(
-      "Сховище IndexedDB недоступне. Тренування не можуть бути завантажені.",
-    );
-    return;
-  }
-
-  await migrateFromLocalStorage();
-
-  let items = await getAllItems();
-  if (items.length === 0) {
-    for (const item of defaultWorkouts) {
-      await addItem(item);
-    }
-  }
-
-  await refreshUI();
 }
 
 let chartAnimationId = null;
@@ -432,26 +348,6 @@ document.addEventListener("visibilitychange", () => {
     chartAnimationId = null;
   }
 });
-
-const weeklyCanvas = document.querySelector("#weekly-chart");
-
-// Зупинка анімації, якщо canvas не в зоні видимості
-if (weeklyCanvas && "IntersectionObserver" in window) {
-  const chartObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        // Якщо полотно вийшло за межі viewport під час активного циклу — скасовуємо кадри
-        if (!entry.isIntersecting && chartAnimationId) {
-          cancelAnimationFrame(chartAnimationId);
-          chartAnimationId = null;
-        }
-      });
-    },
-    { threshold: 0.1 },
-  );
-
-  chartObserver.observe(weeklyCanvas);
-}
 
 function initForm() {
   const formElement = document.querySelector("#workout-form");
@@ -689,7 +585,7 @@ async function renderWorkoutDetailsView(params) {
 
   const durationItem = createDetailItem("Тривалість", `${workout.duration} хв`);
   const dateItem = createDetailItem("Дата проведення", workout.date);
-  
+
   const categoryDescription =
     classifyTraining(workout) === "short"
       ? "Коротке заняття (до 30 хв включно)"
@@ -868,8 +764,7 @@ async function router() {
 
   if (match) {
     await match.view(match.params);
-  }
-  else {
+  } else {
     renderNotFoundView();
   }
 
@@ -915,7 +810,7 @@ function updateActiveNavLink(currentPath) {
 
 window.addEventListener("hashchange", router);
 
-async function initAsync() {
+async function init() {
   try {
     await openDB();
   } catch (error) {
@@ -938,4 +833,4 @@ async function initAsync() {
   await router();
 }
 
-initAsync();
+init();
