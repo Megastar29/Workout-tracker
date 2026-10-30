@@ -775,8 +775,8 @@ async function renderStatsView() {
 
   const chartCanvas = document.createElement("canvas");
   chartCanvas.id = "weekly-chart";
-  chartCanvas.width = 280;
-  chartCanvas.height = 160;
+  chartCanvas.width = 440;
+  chartCanvas.height = 190;
 
   chartSection.append(chartTitle, chartCanvas);
   asideElement.append(chartSection);

@@ -68,29 +68,35 @@ header {
   background-color: #1e1e1e;
   border-bottom: 2px solid #ff6b00;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem max(2rem, calc((100% - 1200px) / 2 + 2rem));
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 header h1 {
   margin: 0;
   padding: 0;
   color: #ff6b00;
+  font-size: 1.5rem;
+  text-align: center;
 }
 
 .main-nav {
   display: flex;
-  gap: 1.25rem;
+  width: 100%;
+  gap: 0.5rem;
 }
 
 .nav-link {
+  flex: 1;
+  text-align: center;
   color: #a0a0a0;
   text-decoration: none;
   font-family: "Montserrat", system-ui, sans-serif;
   font-weight: 600;
-  font-size: 1rem;
-  padding: 0.4rem 0.8rem;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.25rem;
   border-radius: 4px;
   transition: all 0.2s ease;
 }
@@ -204,24 +210,27 @@ form {
 
 .section-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.95rem;
+  margin-bottom: 1.25rem;
 }
 
 .section-header h2 {
   margin: 0;
+  font-size: 1.35rem;
 }
 
 .refresh-button {
   background-color: transparent;
   border: 1px solid #ff6b00;
   color: #ff6b00;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.9rem;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   border-radius: 4px;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.2s ease;
 }
 
@@ -355,9 +364,10 @@ aside {
   border: 1px solid #333;
   border-left: 4px solid #ff6b00;
   border-radius: 8px;
-  padding: 1.5rem;
-  margin-top: 2rem;
+  padding: 1.25rem 1rem;
   width: 100%;
+  max-width: 640px;
+  margin: 1.5rem auto 0 auto;
 }
 
 aside h2 {
@@ -420,6 +430,13 @@ aside h2 {
   background-color: #4caf50;
 }
 
+#weekly-chart {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto 0 auto;
+}
+
 footer {
   padding: 2rem 1.5rem;
   margin-top: 3rem;
@@ -433,30 +450,71 @@ footer p {
 }
 
 .layout {
-  max-width: 1200px;
-  margin: 2rem auto 0 auto;
-  padding: 0 2rem;
+  max-width: 1000px;
+  margin: 1.25rem auto 0 auto;
+  padding: 0 1rem;
+}
+
+.layout > section:has(.card) {
+  max-width: 540px;
+  margin: 0 auto;
 }
 
 @media (min-width: 600px) {
+  header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+  }
+
+  header h1 {
+    font-size: 2rem;
+    text-align: left;
+  }
+
+  .main-nav {
+    width: auto;
+    gap: 1.25rem;
+  }
+
+  .nav-link {
+    flex: initial;
+    padding: 0.4rem 0.8rem;
+    font-size: 1rem;
+  }
+
+  .layout {
+    margin-top: 2rem;
+    padding: 0 2rem;
+  }
+
+  .section-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+
   .cards {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  aside {
+    padding: 1.5rem;
   }
 }
 
 @media (min-width: 1024px) {
+  header {
+    padding: 1.5rem max(2rem, calc((100% - 1200px) / 2 + 2rem));
+  }
+
   .cards {
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .layout {
-    display: grid;
-    grid-template-columns: 3fr 1fr;
-    gap: 32px;
-    align-items: start;
-  }
-
-  aside {
-    margin-top: calc(1.5rem * 1.25 + 1rem);
   }
 }
