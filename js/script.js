@@ -117,12 +117,12 @@ async function migrateFromLocalStorage() {
   }
 }
 
-const listContainer = document.querySelector("#workouts-list");
 const form = document.querySelector("#workout-form");
 const minutesInput = document.querySelector("#duration-input");
 
 //Функція для рендеру карток за масивом даних
 function renderCards(workouts) {
+  const listContainer = document.querySelector("#workouts-list");
   listContainer.innerHTML = "";
   for (const workout of workouts) {
     const card = document.createElement("article");
@@ -130,17 +130,27 @@ function renderCards(workouts) {
     const details = document.createElement("p");
     card.classList.add("card");
 
-    type.textContent = workout.type;
+    //type.textContent = workout.type;
 
     const cardHeader = document.createElement("div");
     cardHeader.classList.add("card-header");
+
+    const titleLink = document.createElement("a");
+    titleLink.href = `#/workouts/${workout.id}`;
+    titleLink.classList.add("card-title-link");
+    titleLink.textContent = workout.type;
+
+    type.append(titleLink);
 
     const deleteBtn = document.createElement("button");
     deleteBtn.type = "button";
     deleteBtn.classList.add("card-delete-btn");
     deleteBtn.textContent = "×";
     deleteBtn.title = "Видалити";
-    deleteBtn.addEventListener("click", () => deleteWorkout(workout.id));
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteWorkout(workout.id);
+    });
 
     cardHeader.append(type, deleteBtn);
     card.append(cardHeader);
@@ -443,3 +453,387 @@ if (weeklyCanvas && "IntersectionObserver" in window) {
 }
 
 init();
+
+function initForm() {
+  const formElement = document.querySelector("#workout-form");
+  const minutesInput = document.querySelector("#duration-input");
+  if (!formElement || !minutesInput) return;
+
+  minutesInput.addEventListener("input", () => {
+    const maxVal = 600;
+    const minVal = 1;
+
+    if (Number(minutesInput.value) > maxVal) {
+      minutesInput.setCustomValidity(
+        `Тривалість не може перевищувати ${maxVal} хв (10 годин)!`,
+      );
+    } else if (Number(minutesInput.value) < minVal) {
+      minutesInput.setCustomValidity("Тривалість має бути щонайменше 1 хв!");
+    } else {
+      minutesInput.setCustomValidity("");
+    }
+  });
+
+  formElement.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const typeSelect = document.querySelector("#workout-type");
+    const dateInput = document.querySelector("#workout-date");
+
+    const newTraining = {
+      type: typeSelect.value,
+      duration: Number(minutesInput.value),
+      date: dateInput.value,
+    };
+
+    try {
+      await addItem(newTraining);
+      const currentWorkouts = await getAllItems();
+      // Повторно викликаємо наявну функцію рендеру карток
+      renderCards(currentWorkouts);
+      formElement.reset();
+    } catch (error) {
+      console.error("Помилка збереження запису:", error);
+      alert("Не вдалося зберегти тренування. Спробуйте ще раз.");
+    }
+  });
+}
+
+function createForm() {
+  const form = document.createElement("form");
+  form.id = "workout-form";
+  form.action = "#";
+  form.method = "post";
+
+  const typeGroup = document.createElement("div");
+  typeGroup.classList.add("form-group");
+
+  const typeLabel = document.createElement("label");
+  typeLabel.classList.add("form-label");
+  typeLabel.htmlFor = "workout-type";
+  typeLabel.textContent = "Тип тренування:";
+
+  const typeSelect = document.createElement("select");
+  typeSelect.id = "workout-type";
+  typeSelect.name = "workout-type";
+  typeSelect.classList.add("value-input");
+  typeSelect.required = true;
+
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  defaultOption.textContent = "Оберіть тип";
+  typeSelect.append(defaultOption);
+
+  const workoutTypes = [
+    "Силове",
+    "Кардіо",
+    "Йога",
+    "Функціональне",
+    "Командний спорт",
+  ];
+
+  for (const type of workoutTypes) {
+    const opt = document.createElement("option");
+    opt.value = type;
+    opt.textContent = type;
+    typeSelect.append(opt);
+  }
+  typeGroup.append(typeLabel, typeSelect);
+
+  const durationGroup = document.createElement("div");
+  durationGroup.classList.add("form-group");
+
+  const durationLabel = document.createElement("label");
+  durationLabel.classList.add("form-label");
+  durationLabel.htmlFor = "duration-input";
+  durationLabel.textContent = "Тривалість (хв):";
+
+  const durationInput = document.createElement("input");
+  durationInput.id = "duration-input";
+  durationInput.name = "duration-input";
+  durationInput.type = "number";
+  durationInput.classList.add("value-input");
+  durationInput.min = "1";
+  durationInput.max = "600";
+  durationInput.placeholder = "Введіть тривалість у хвилинах";
+  durationInput.required = true;
+  durationGroup.append(durationLabel, durationInput);
+
+  const dateGroup = document.createElement("div");
+  dateGroup.classList.add("form-group");
+
+  const dateLabel = document.createElement("label");
+  dateLabel.classList.add("form-label");
+  dateLabel.htmlFor = "workout-date";
+  dateLabel.textContent = "Дата тренування:";
+
+  const dateInput = document.createElement("input");
+  dateInput.id = "workout-date";
+  dateInput.name = "workout-date";
+  dateInput.type = "date";
+  dateInput.classList.add("value-input");
+  dateInput.required = true;
+  dateGroup.append(dateLabel, dateInput);
+
+  const submitBtn = document.createElement("button");
+  submitBtn.type = "submit";
+  submitBtn.classList.add("submit-button");
+  submitBtn.textContent = "Додати тренування";
+
+  form.append(typeGroup, durationGroup, dateGroup, submitBtn);
+  return form;
+}
+
+const appContainer = document.querySelector("#app");
+
+async function renderJournalView() {
+  appContainer.innerHTML = "";
+
+  const journalMain = document.createElement("main");
+  journalMain.classList.add("journal-layout");
+
+  const formSection = document.createElement("section");
+  formSection.classList.add("form-section");
+
+  const formTitle = document.createElement("h2");
+  formTitle.textContent = "Додати тренування";
+
+  const formElement = createForm();
+  formSection.append(formTitle, formElement);
+
+  const historySection = document.createElement("section");
+  historySection.classList.add("history-section");
+
+  const historyTitle = document.createElement("h2");
+  historyTitle.textContent = "Історія тренувань";
+
+  const listContainer = document.createElement("div");
+  listContainer.id = "workouts-list";
+  listContainer.classList.add("cards");
+  historySection.append(historyTitle, listContainer);
+
+  journalMain.append(formSection, historySection);
+  appContainer.append(journalMain);
+
+  const currentWorkouts = await getAllItems();
+  renderCards(currentWorkouts);
+
+  initForm();
+}
+
+async function renderWorkoutDetailsView(params) {
+  appContainer.innerHTML = "";
+
+  const targetId = Number(params.id);
+  const currentWorkouts = await getAllItems();
+  const workout = currentWorkouts.find((item) => item.id === targetId);
+
+  const detailsSection = document.createElement("section");
+
+  const sectionHeader = document.createElement("div");
+  sectionHeader.classList.add("section-header");
+
+  const pageTitle = document.createElement("h2");
+  pageTitle.textContent = "Деталі тренування";
+
+  const backLink = document.createElement("a");
+  backLink.href = "#/";
+  backLink.classList.add("refresh-button");
+  backLink.style.textDecoration = "none";
+  backLink.textContent = "← Назад до журналу";
+
+  sectionHeader.append(pageTitle, backLink);
+  detailsSection.append(sectionHeader);
+
+  if (!workout) {
+    const notFoundMessage = document.createElement("p");
+    notFoundMessage.classList.add("status-message", "visible", "error");
+    notFoundMessage.textContent = `Тренування з ID #${targetId} не знайдено в базі даних або воно було видалене.`;
+
+    detailsSection.append(notFoundMessage);
+    appContainer.append(detailsSection);
+    return;
+  }
+
+  const card = document.createElement("article");
+  card.classList.add("card", classifyTraining(workout));
+  card.style.maxWidth = "480px";
+
+  const cardHeader = document.createElement("div");
+  cardHeader.classList.add("card-header");
+
+  const workoutTitle = document.createElement("h3");
+  workoutTitle.textContent = workout.type;
+
+  const workoutIdSpan = document.createElement("span");
+  workoutIdSpan.style.color = "#a0a0a0";
+  workoutIdSpan.style.fontSize = "0.9rem";
+  workoutIdSpan.textContent = `ID: #${workout.id}`;
+
+  cardHeader.append(workoutTitle, workoutIdSpan);
+
+  function createDetailItem(labelText, valueText) {
+    const p = document.createElement("p");
+    const strong = document.createElement("strong");
+    strong.textContent = `${labelText}: `;
+    strong.style.color = "#f5f5f5";
+
+    const textSpan = document.createElement("span");
+    textSpan.textContent = valueText;
+
+    p.append(strong, textSpan);
+    return p;
+  }
+
+  const durationItem = createDetailItem("Тривалість", `${workout.duration} хв`);
+  const dateItem = createDetailItem("Дата проведення", workout.date);
+  
+  const categoryDescription =
+    classifyTraining(workout) === "short"
+      ? "Коротке заняття (до 30 хв включно)"
+      : "Тривале заняття (понад 30 хв)";
+  const categoryItem = createDetailItem("Категорія", categoryDescription);
+
+  card.append(cardHeader, durationItem, dateItem, categoryItem);
+  detailsSection.append(card);
+  appContainer.append(detailsSection);
+}
+
+async function renderStatsView() {
+  appContainer.innerHTML = "";
+
+  const asideElement = document.createElement("aside");
+  asideElement.setAttribute("aria-labelledby", "statistics-heading");
+
+  const heading = document.createElement("h2");
+  heading.id = "statistics-heading";
+  heading.textContent = "Статистика";
+  asideElement.append(heading);
+
+  function createStatItem(labelText, valueId, defaultValue) {
+    const p = document.createElement("p");
+    p.classList.add("statistics-item");
+
+    const labelSpan = document.createElement("span");
+    labelSpan.classList.add("statistics-label");
+    labelSpan.textContent = labelText;
+
+    const valueSpan = document.createElement("span");
+    valueSpan.classList.add("statistics-value");
+    valueSpan.id = valueId;
+    valueSpan.textContent = defaultValue;
+
+    p.append(labelSpan, valueSpan);
+    return p;
+  }
+
+  asideElement.append(
+    createStatItem("Кількість тренувань:", "count-trainings", "0"),
+    createStatItem("Загальний час:", "total-time", "0 хв"),
+    createStatItem("Середній час тренування:", "average-time", "0 хв"),
+    createStatItem("Час за поточний тиждень:", "weekly-duration", "0 хв"),
+  );
+
+  const progressSection = document.createElement("div");
+  progressSection.classList.add("progress-bar-section");
+
+  const progressLabels = document.createElement("div");
+  progressLabels.classList.add("progress-bar-labels");
+
+  const goalTitle = document.createElement("span");
+  goalTitle.textContent = "Ціль на тиждень:";
+
+  const goalText = document.createElement("strong");
+  goalText.id = "weekly-goal-text";
+  goalText.textContent = "0 / 5";
+
+  progressLabels.append(goalTitle, goalText);
+
+  const progressBar = document.createElement("div");
+  progressBar.id = "progress-bar";
+  progressBar.classList.add("progress-bar");
+  progressBar.setAttribute("role", "progressbar");
+  progressBar.setAttribute("aria-valuenow", "0");
+  progressBar.setAttribute("aria-valuemin", "0");
+  progressBar.setAttribute("aria-valuemax", "100");
+
+  const progressFill = document.createElement("div");
+  progressFill.id = "progress-bar-fill";
+  progressFill.classList.add("progress-fill");
+  progressBar.append(progressFill);
+
+  progressSection.append(progressLabels, progressBar);
+  asideElement.append(progressSection);
+
+  const chartSection = document.createElement("div");
+  chartSection.classList.add("chart-section");
+
+  const chartTitle = document.createElement("h3");
+  chartTitle.textContent = "Графік за днями тижня";
+
+  const chartCanvas = document.createElement("canvas");
+  chartCanvas.id = "weekly-chart";
+  chartCanvas.width = 280;
+  chartCanvas.height = 160;
+
+  chartSection.append(chartTitle, chartCanvas);
+  asideElement.append(chartSection);
+
+  appContainer.append(asideElement);
+
+  const currentWorkouts = await getAllItems();
+  updateStatistics(currentWorkouts);
+  animateWeeklyChart(currentWorkouts);
+
+  // Зупинка анімації, якщо canvas не в зоні видимості
+  if ("IntersectionObserver" in window) {
+    const chartObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Якщо полотно вийшло за межі viewport під час активного циклу — скасовуємо кадри
+          if (!entry.isIntersecting && chartAnimationId) {
+            cancelAnimationFrame(chartAnimationId);
+            chartAnimationId = null;
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
+
+    chartObserver.observe(chartCanvas);
+  }
+}
+
+const routes = [
+  { path: "/", view: renderJournalView },
+  { path: "/workouts/:id", view: renderWorkoutDetailsView },
+  { path: "/stats", view: renderStatsView },
+];
+
+function matchRoute(path) {
+  const pathParts = path.split("/").filter(Boolean);
+  for (const route of routes) {
+    const routeParts = route.path.split("/").filter(Boolean);
+    if (routeParts.length !== pathParts.length) {
+      continue;
+    }
+
+    const params = {};
+    const isMatch = routeParts.every((part, i) => {
+      if (part.startsWith(":")) {
+        params[part.slice(1)] = pathParts[i];
+        return true;
+      }
+
+      return part === pathParts[i];
+    });
+
+    if (isMatch) {
+      return { view: route.view, params };
+    }
+  }
+
+  return null;
+}

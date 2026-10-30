@@ -301,6 +301,15 @@ form {
   font-weight: 500;
 }
 
+.card-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card-title-link:hover {
+  text-decoration: underline;
+}
+
 aside {
   background-color: #1e1e1e;
   border: 1px solid #333;
