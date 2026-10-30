@@ -139,6 +139,7 @@ function renderCards(workouts) {
     titleLink.href = `#/workouts/${workout.id}`;
     titleLink.classList.add("card-title-link");
     titleLink.textContent = workout.type;
+    titleLink.setAttribute("data-link", "");
 
     type.append(titleLink);
 
@@ -452,8 +453,6 @@ if (weeklyCanvas && "IntersectionObserver" in window) {
   chartObserver.observe(weeklyCanvas);
 }
 
-init();
-
 function initForm() {
   const formElement = document.querySelector("#workout-form");
   const minutesInput = document.querySelector("#duration-input");
@@ -643,6 +642,7 @@ async function renderWorkoutDetailsView(params) {
   backLink.classList.add("refresh-button");
   backLink.style.textDecoration = "none";
   backLink.textContent = "← Назад до журналу";
+  backLink.setAttribute("data-link", "");
 
   sectionHeader.append(pageTitle, backLink);
   detailsSection.append(sectionHeader);
@@ -837,3 +837,105 @@ function matchRoute(path) {
 
   return null;
 }
+
+function navigate(url) {
+  if (!url) {
+    return;
+  }
+
+  window.location.hash = url.startsWith("#") ? url : `#${url}`;
+}
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest("[data-link]");
+
+  if (link) {
+    event.preventDefault();
+    const targetUrl = link.getAttribute("href");
+    navigate(targetUrl);
+  }
+});
+
+async function router() {
+  let path = window.location.hash.slice(1);
+
+  if (!path || path === "") {
+    window.location.hash = "#/";
+    return;
+  }
+
+  const match = matchRoute(path);
+
+  if (match) {
+    await match.view(match.params);
+  }
+  else {
+    renderNotFoundView();
+  }
+
+  updateActiveNavLink(path);
+}
+
+function renderNotFoundView() {
+  appContainer.innerHTML = "";
+
+  const section = document.createElement("section");
+  section.style.textAlign = "center";
+  section.style.padding = "3rem 1rem";
+
+  const title = document.createElement("h2");
+  title.textContent = "404 — Сторінку не знайдено";
+
+  const desc = document.createElement("p");
+  desc.textContent = "Маршрут, за яким ви перейшли, відсутній у системі.";
+  desc.style.color = "#a0a0a0";
+
+  const backLink = document.createElement("a");
+  backLink.href = "#/";
+  backLink.classList.add("refresh-button");
+  backLink.setAttribute("data-link", "");
+  backLink.style.display = "inline-block";
+  backLink.style.marginTop = "1rem";
+  backLink.style.textDecoration = "none";
+  backLink.textContent = "Повернутися до журналу";
+
+  section.append(title, desc, backLink);
+  appContainer.append(section);
+}
+
+function updateActiveNavLink(currentPath) {
+  const navLinks = document.querySelectorAll(".main-nav .nav-link");
+
+  navLinks.forEach((link) => {
+    const linkHref = link.getAttribute("href").replace("#", "");
+
+    link.classList.toggle("active", linkHref === currentPath);
+  });
+}
+
+window.addEventListener("hashchange", router);
+
+async function initAsync() {
+  try {
+    await openDB();
+  } catch (error) {
+    console.error("Помилка відкриття IndexedDB:", error);
+    showDatabaseError(
+      "Сховище IndexedDB недоступне. Тренування не можуть бути завантажені.",
+    );
+    return;
+  }
+
+  await migrateFromLocalStorage();
+
+  let items = await getAllItems();
+  if (items.length === 0) {
+    for (const item of defaultWorkouts) {
+      await addItem(item);
+    }
+  }
+
+  await router();
+}
+
+initAsync();
