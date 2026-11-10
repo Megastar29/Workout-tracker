@@ -5,8 +5,10 @@ const workouts = require("./workouts.json");
 const app = express();
 const PORT = 3000;
 
+// Роздача файлів HTML, CSS, JS з кореневої папки проєкту
 app.use(express.static(path.join(__dirname, "..")));
 
+// Обробник GET запитів
 app.get("/api/workouts", (req, res) => {
   const { week } = req.query;
 
@@ -18,16 +20,20 @@ app.get("/api/workouts", (req, res) => {
       return res.status(200).json(filtered);
     }
 
-    return res.status(404).json({ error: `Тренувань за період "${week}" не знайдено` });
+    return res
+      .status(404)
+      .json({ error: `Тренувань за період "${week}" не знайдено` });
   }
 
   res.status(200).json(workouts);
 });
 
+// Запуск сервера
 app.listen(PORT, () =>
   console.log(`Сервер успішно запущено на http://localhost:${PORT}`),
 );
 
+// Функція для визначення чи задана дата знаходиться у межах поточного тижня
 function isWithinCurrentWeek(dateString) {
   if (!dateString) {
     return false;

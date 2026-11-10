@@ -545,6 +545,7 @@ async function renderJournalView() {
   journalMain.append(formSection, historySection);
   appContainer.append(journalMain);
 
+  // Функція для завантаження даних із сервера через fetch
   async function loadFromServer(url) {
     statusEl.textContent = "Завантаження даних із сервера...";
     statusEl.className = "api-status-message loading";
@@ -569,6 +570,7 @@ async function renderJournalView() {
     }
   }
 
+  // Функція для активації кнопок
   function setActiveButton(activeBtn) {
     [refreshAllBtn, refreshWeekBtn, loadDbBtn].forEach((btn) =>
       btn.classList.remove("active"),
@@ -576,16 +578,19 @@ async function renderJournalView() {
     activeBtn.classList.add("active");
   }
 
+  // Обробник події "клік" для кнопки взяття даних із сервера
   refreshAllBtn.addEventListener("click", () => {
     setActiveButton(refreshAllBtn);
     loadFromServer("/api/workouts");
   });
 
+  // Обробник події "клік" для кнопки взяття даних за тиждень із сервера
   refreshWeekBtn.addEventListener("click", () => {
     setActiveButton(refreshWeekBtn);
     loadFromServer("/api/workouts?week=current");
   });
 
+  // Обробник події "клік" для кнопки взяття даних із БД
   loadDbBtn.addEventListener("click", async () => {
     const dbWorkouts = await getAllItems();
     renderCards(dbWorkouts);
