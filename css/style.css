@@ -245,6 +245,43 @@ form {
   cursor: not-allowed;
 }
 
+.refresh-button.active {
+  background-color: #ff6b00;
+  color: #121212;
+}
+
+.api-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.api-status-message {
+  margin: 0 0 1.25rem 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  min-height: 1.4rem;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+}
+
+.api-status-message.loading {
+  color: #ff9800;
+}
+
+.api-status-message.success {
+  color: #4caf50;
+}
+
+.api-status-message.error {
+  color: #ff5252;
+}
+
+.api-status-message:empty {
+  display: none;
+}
+
 .status-message {
   margin: 0 0 1rem 0;
   font-size: 0.95rem;

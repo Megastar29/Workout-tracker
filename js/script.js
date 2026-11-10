@@ -505,19 +505,101 @@ async function renderJournalView() {
   const historySection = document.createElement("section");
   historySection.classList.add("history-section");
 
+  const historyHeader = document.createElement("div");
+  historyHeader.classList.add("section-header");
+
   const historyTitle = document.createElement("h2");
   historyTitle.textContent = "Історія тренувань";
+
+  const actionsPanel = document.createElement("div");
+  actionsPanel.classList.add("api-actions");
+
+  const refreshAllBtn = document.createElement("button");
+  refreshAllBtn.type = "button";
+  refreshAllBtn.classList.add("refresh-button");
+  refreshAllBtn.textContent = "Всі (Сервер)";
+
+  const refreshWeekBtn = document.createElement("button");
+  refreshWeekBtn.type = "button";
+  refreshWeekBtn.classList.add("refresh-button");
+  refreshWeekBtn.textContent = "Поточний тиждень";
+
+  const loadDbBtn = document.createElement("button");
+  loadDbBtn.type = "button";
+  loadDbBtn.classList.add("refresh-button");
+  loadDbBtn.textContent = "Моя база (IndexedDB)";
+
+  actionsPanel.append(refreshAllBtn, refreshWeekBtn, loadDbBtn);
+  historyHeader.append(historyTitle, actionsPanel);
+
+  const statusEl = document.createElement("div");
+  statusEl.id = "api-status";
+  statusEl.classList.add("api-status-message");
 
   const listContainer = document.createElement("div");
   listContainer.id = "workouts-list";
   listContainer.classList.add("cards");
-  historySection.append(historyTitle, listContainer);
+
+  historySection.append(historyHeader, statusEl, listContainer);
 
   journalMain.append(formSection, historySection);
   appContainer.append(journalMain);
 
+  async function loadFromServer(url) {
+    statusEl.textContent = "Завантаження даних із сервера...";
+    statusEl.className = "api-status-message loading";
+
+    try {
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `Помилка HTTP: ${res.status}`);
+      }
+
+      const data = await res.json();
+      renderCards(data);
+
+      statusEl.textContent = `Завантажено тренувань із сервера: ${data.length}`;
+      statusEl.className = "api-status-message success";
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = `Збій: ${err.message}`;
+      statusEl.className = "api-status-message error";
+    }
+  }
+
+  function setActiveButton(activeBtn) {
+    [refreshAllBtn, refreshWeekBtn, loadDbBtn].forEach((btn) =>
+      btn.classList.remove("active"),
+    );
+    activeBtn.classList.add("active");
+  }
+
+  refreshAllBtn.addEventListener("click", () => {
+    setActiveButton(refreshAllBtn);
+    loadFromServer("/api/workouts");
+  });
+
+  refreshWeekBtn.addEventListener("click", () => {
+    setActiveButton(refreshWeekBtn);
+    loadFromServer("/api/workouts?week=current");
+  });
+
+  loadDbBtn.addEventListener("click", async () => {
+    const dbWorkouts = await getAllItems();
+    renderCards(dbWorkouts);
+    statusEl.textContent = `Відображено локальні дані (${dbWorkouts.length} записів)`;
+    statusEl.className = "api-status-message";
+    setActiveButton(loadDbBtn);
+  });
+
   const currentWorkouts = await getAllItems();
   renderCards(currentWorkouts);
+
+  statusEl.textContent = `Відображено локальні дані (${currentWorkouts.length} записів)`;
+  statusEl.className = "api-status-message";
+  loadDbBtn.className = "refresh-button active";
 
   initForm();
 }
