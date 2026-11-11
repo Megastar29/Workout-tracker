@@ -1,7 +1,14 @@
+// Допоміжна функція для отримання дати зі зміщенням у днях
+function getRelativeDate(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return d.toISOString().split("T")[0];
+}
+
 const defaultWorkouts = [
-  { id: 1, type: "Командний спорт", duration: 40, date: "2026-10-12" },
-  { id: 2, type: "Кардіо", duration: 15, date: "2026-10-14" },
-  { id: 3, type: "Силове", duration: 30, date: "2026-10-17" },
+  { id: 1, type: "Командний спорт", duration: 40, date: getRelativeDate(-1) },
+  { id: 2, type: "Кардіо", duration: 15, date: getRelativeDate(0) },
+  { id: 3, type: "Силове", duration: 30, date: getRelativeDate(1) },
 ];
 
 const storage_key = "workouts";
@@ -123,15 +130,15 @@ function renderCards(workouts) {
     const details = document.createElement("p");
     card.classList.add("card");
 
-    //type.textContent = workout.type;
-
     const cardHeader = document.createElement("div");
     cardHeader.classList.add("card-header");
 
     const titleLink = document.createElement("a");
     titleLink.href = `#/workouts/${workout.id}`;
     titleLink.classList.add("card-title-link");
+
     titleLink.textContent = workout.type;
+
     titleLink.setAttribute("data-link", "");
 
     type.append(titleLink);

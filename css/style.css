@@ -51,19 +51,6 @@ p {
   line-height: 1.5;
 }
 
-/* header {
-  background-color: #1e1e1e;
-  padding: 1.5rem 0;
-  border-bottom: 2px solid #ff6b00;
-}
-
-header h1 {
-  max-width: 1200px;
-  padding: 0 2rem;
-  margin: 0 auto;
-  color: #ff6b00;
-} */
-
 header {
   background-color: #1e1e1e;
   border-bottom: 2px solid #ff6b00;

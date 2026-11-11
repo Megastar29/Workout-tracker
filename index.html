@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Трекер тренувань</title>
     <link rel="stylesheet" href="css/style.css" />
-    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
-    <script src="js/script.js" defer></script>
+    <link rel="icon" type="image/png" href="assets/img/favicon.png" />
+    <script src="js/script.js" defer></script>    
   </head>
   <body>
     <header>
@@ -69,11 +69,6 @@
               />
             </div>
 
-            <!-- <p id="cpm-preview">
-              <span>Інтенсивність: </span>
-              <span><strong id="cpm-value">0</strong> ккал/хв</span>
-            </p> -->
-
             <button class="submit-button" type="submit">
               Додати тренування
             </button>
@@ -83,86 +78,11 @@
         <section>
           <div class="section-header">
             <h2>Історія тренувань</h2>
-            <!-- <button id="refresh-button" class="refresh-button" type="button">
-              Оновити
-            </button> -->
           </div>
 
           <p id="status-message" class="status-message" aria-live="polite"></p>
 
           <div id="workouts-list" class="cards">
-            <!-- <workout-row
-              v-for="workout in workouts"
-              :id="workout.id"
-              :key="workout.id"
-              :type="workout.type"
-              :minutes="workout.minutes"
-              :calories="workout.calories"
-              @delete-workout="removeWorkout"
-            ></workout-row> -->
-
-            <!-- <article class="card">
-              <span class="workout-badge" aria-hidden="true">🎾</span>
-
-              <div class="card-content">
-                <h3>
-                  <span>10.09.2026</span> -
-                  <span>Командний спорт</span>
-                </h3>
-
-                <p>
-                  <span class="label">Назва:</span>
-                  <span>Теніс</span>
-                </p>
-
-                <p>
-                  <span class="label">Тривалість:</span>
-                  <span>40 хв</span>
-                </p>
-              </div>
-            </article>
-
-            <article class="card">
-              <span class="workout-badge" aria-hidden="true">💓</span>
-
-              <div class="card-content">
-                <h3>
-                  <span>10.09.2026</span> -
-                  <span>Кардіо</span>
-                </h3>
-
-                <p>
-                  <span class="label">Назва:</span>
-                  <span>Біг</span>
-                </p>
-
-                <p>
-                  <span class="label">Тривалість:</span>
-                  <span>5 хв</span>
-                </p>
-              </div>
-            </article>
-
-            <article class="card">
-              <span class="workout-badge" aria-hidden="true">🏋️‍♂️</span>
-
-              <div class="card-content">
-                <h3>
-                  <span>11.09.2026</span> -
-                  <span>Силове</span>
-                </h3>
-
-                <p>
-                  <span class="label">Назва:</span>
-                  <span>Штанга</span>
-                </p>
-
-                <p>
-                  <span class="label">Тривалість:</span>
-                  <span>30 хв</span>
-                </p>
-              </div>
-            </article> -->
           </div>
         </section>
       </main>
@@ -184,10 +104,6 @@
           <span class="statistics-value" id="average-time">0 хв</span>
         </p>
 
-        <!-- <p class="statistics-item">
-          <span class="statistics-label">Спалені калорії:</span>
-          <span class="statistics-value" id="total-calories">0 ккал</span>
-        </p> -->
         <p class="statistics-item">
           <span class="statistics-label">Час за поточний тиждень:</span>
           <span class="statistics-value" id="weekly-duration">0 хв</span>
