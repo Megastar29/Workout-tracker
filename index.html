@@ -4,12 +4,141 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Трекер тренувань</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" type="image/png" href="assets/img/favicon.png" />
+    <script src="js/script.js" defer></script>    
   </head>
   <body>
-    <!-- Шапка з назвою -->
-    <!-- Форма для додавання тренування -->
-    <!-- Список тренувань -->
-    <!-- Блок статистики -->
-    <!-- Підвал -->
+    <header>
+      <h1>Трекер тренувань</h1>
+      <nav class="main-nav">
+      <a href="#/" class="nav-link" data-link>Журнал</a>
+      <a href="#/stats" class="nav-link" data-link>Статистика</a>
+    </nav>
+    </header>
+
+    <div class="layout" id="app">
+      <main>
+        <section>
+          <h2>Додати тренування</h2>
+          <form id="workout-form" action="#" method="post">
+            <div class="form-group">
+              <label class="form-label" for="workout-type"
+                >Тип тренування:</label
+              >
+              <select
+                class="value-input"
+                name="type"
+                id="workout-type"
+                required
+              >
+                <option value="" disabled selected>Оберіть тип</option>
+                <option value="Силове">Силове</option>
+                <option value="Кардіо">Кардіо</option>
+                <option value="Функціональне">Функціональне</option>
+                <option value="Йога">Йога</option>
+                <option value="Командний спорт">Командний спорт</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="duration-input"
+                >Тривалість (хв):</label
+              >
+              <input
+                class="value-input"
+                type="number"
+                id="duration-input"
+                name="minutes"
+                min="1"
+                max="600"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="workout-date"
+                >Дата тренування:</label
+              >
+              <input
+                class="value-input"
+                type="date"
+                id="workout-date"
+                name="date"
+                required
+              />
+            </div>
+
+            <button class="submit-button" type="submit">
+              Додати тренування
+            </button>
+          </form>
+        </section>
+
+        <section>
+          <div class="section-header">
+            <h2>Історія тренувань</h2>
+          </div>
+
+          <p id="status-message" class="status-message" aria-live="polite"></p>
+
+          <div id="workouts-list" class="cards">
+          </div>
+        </section>
+      </main>
+
+      <aside aria-labelledby="statistics-heading">
+        <h2 id="statistics-heading">Статистика</h2>
+        <p class="statistics-item">
+          <span class="statistics-label">Кількість тренувань:</span>
+          <span class="statistics-value" id="count-trainings">0</span>
+        </p>
+
+        <p class="statistics-item">
+          <span class="statistics-label">Загальний час:</span>
+          <span class="statistics-value" id="total-time">0 хв</span>
+        </p>
+
+        <p class="statistics-item">
+          <span class="statistics-label">Середній час тренування:</span>
+          <span class="statistics-value" id="average-time">0 хв</span>
+        </p>
+
+        <p class="statistics-item">
+          <span class="statistics-label">Час за поточний тиждень:</span>
+          <span class="statistics-value" id="weekly-duration">0 хв</span>
+        </p>
+
+        <div class="progress-bar-section">
+          <div class="progress-bar-labels">
+            <span>Ціль на тиждень:</span>
+            <strong id="weekly-goal-text">0 / 5</strong>
+          </div>
+
+          <div
+            id="progress-bar"
+            class="progress-bar"
+            role="progressbar"
+            aria-valuenow="0"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <div class="progress-fill" id="progress-bar-fill"></div>
+          </div>
+        </div>
+
+        <div class="chart-section">
+          <h3>Графік за днями тижня</h3>
+          <canvas id="weekly-chart" width="280" height="160"></canvas>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      <p>
+        &copy; 2026 р. Автор: Назар Мриглод, навчальний проєкт на
+        вебпрограмування
+      </p>
+    </footer>
   </body>
 </html>
